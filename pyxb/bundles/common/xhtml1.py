@@ -10,16 +10,22 @@ DefaultValidationConfig = pyxb.GlobalValidationConfig.copy()
 """The validation configuration that applies to complex types in this namespace."""
 
 DefaultValidationConfig._setContentInfluencesGeneration(DefaultValidationConfig.ALWAYS)
-DefaultValidationConfig._setOrphanElementInContent(DefaultValidationConfig.RAISE_EXCEPTION)
-DefaultValidationConfig._setInvalidElementInContent(DefaultValidationConfig.RAISE_EXCEPTION)
+DefaultValidationConfig._setOrphanElementInContent(
+    DefaultValidationConfig.RAISE_EXCEPTION
+)
+DefaultValidationConfig._setInvalidElementInContent(
+    DefaultValidationConfig.RAISE_EXCEPTION
+)
 
-def _setValidationConfig ():
+
+def _setValidationConfig():
     import inspect
     import sys
     import pyxb.binding.basis
 
-    for (n, v) in inspect.getmembers(_raw):
+    for n, v in inspect.getmembers(_raw):
         if inspect.isclass(v) and issubclass(v, pyxb.binding.basis._TypeBinding_mixin):
             v._SetValidationConfig(DefaultValidationConfig)
+
 
 _setValidationConfig()

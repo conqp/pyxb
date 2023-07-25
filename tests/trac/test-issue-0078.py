@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -9,7 +10,8 @@ import pyxb.utils.domutils
 from xml.dom import Node
 
 import os.path
-xsd='''<?xml version="1.0" encoding="UTF-8"?>
+
+xsd = """<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:simpleType name="tla">
     <xs:restriction base="xs:string">
@@ -40,12 +42,12 @@ xsd='''<?xml version="1.0" encoding="UTF-8"?>
     </xs:complexContent>
   </xs:complexType>
   <xs:element name="lcenv" type="lcenv"/>
-</xs:schema>'''
+</xs:schema>"""
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#open('code.py', 'w').write(code)
+# open('code.py', 'w').write(code)
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
@@ -53,35 +55,37 @@ from pyxb.exceptions_ import *
 import unittest
 import sys
 
-class TestIssue0078 (unittest.TestCase):
-    def testInheritance (self):
+
+class TestIssue0078(unittest.TestCase):
+    def testInheritance(self):
         self.assertTrue(issubclass(lctla_, tla_))
         self.assertTrue(issubclass(lcenv_, env_))
 
-    def testSimpleTypes (self):
-        self.assertEqual('FOO', tla('FOO'))
-        self.assertEqual('foo', lctla('foo'))
-        self.assertRaises(SimpleFacetValueError, lctla, 'FOO');
+    def testSimpleTypes(self):
+        self.assertEqual("FOO", tla("FOO"))
+        self.assertEqual("foo", lctla("foo"))
+        self.assertRaises(SimpleFacetValueError, lctla, "FOO")
 
-    def testBase (self):
-        instance = env();
-        instance.tla = 'FOO';
-        xmlt = '<env><tla>FOO</tla></env>';
-        xmld = xmlt.encode('utf-8');
-        self.assertEqual(instance.toxml('utf-8', root_only=True), xmld);
+    def testBase(self):
+        instance = env()
+        instance.tla = "FOO"
+        xmlt = "<env><tla>FOO</tla></env>"
+        xmld = xmlt.encode("utf-8")
+        self.assertEqual(instance.toxml("utf-8", root_only=True), xmld)
 
-    def testRestr (self):
-        instance = lcenv();
-        instance.tla = 'foo';
-        xmlt = '<lcenv><tla>foo</tla></lcenv>';
-        xmld = xmlt.encode('utf-8');
-        self.assertEqual(instance.toxml('utf-8', root_only=True), xmld)
+    def testRestr(self):
+        instance = lcenv()
+        instance.tla = "foo"
+        xmlt = "<lcenv><tla>foo</tla></lcenv>"
+        xmld = xmlt.encode("utf-8")
+        self.assertEqual(instance.toxml("utf-8", root_only=True), xmld)
 
-    def testRestrValidation (self):
-        instance = lcenv();
+    def testRestrValidation(self):
+        instance = lcenv()
         with self.assertRaises(SimpleFacetValueError) as cm:
-            instance.tla = 'FOO';
+            instance.tla = "FOO"
         self.assertTrue(isinstance(cm.exception, SimpleFacetValueError))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

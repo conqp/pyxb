@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -10,7 +11,8 @@ from xml.dom import Node
 import pyxb.binding.datatypes as xs
 
 import os.path
-xsd='''<?xml version="1.0" encoding="UTF-8"?>
+
+xsd = """<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:simpleType name="rDateTime">
     <xs:restriction base="xs:dateTime">
@@ -42,25 +44,29 @@ xsd='''<?xml version="1.0" encoding="UTF-8"?>
       <xs:maxInclusive value="2340"/>
     </xs:restriction>
   </xs:simpleType>
-</xs:schema>'''
+</xs:schema>"""
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#open('code.py', 'w').write(code)
+# open('code.py', 'w').write(code)
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
 
 import unittest
 
-class TestTrac0231 (unittest.TestCase):
-    def testFacets (self):
-        self.assertEqual('2010-01-01T00:00:00Z', rDateTime._CF_minInclusive.value().xsdLiteral())
-        self.assertEqual('2010-01-01', rDate._CF_minInclusive.value().xsdLiteral())
-        self.assertEqual('--01-01', rGmonthDay._CF_minInclusive.value().xsdLiteral())
-        self.assertEqual('00:00:00Z', rTime._CF_minInclusive.value().xsdLiteral())
-        self.assertEqual('2340.0', rDecimal._CF_maxInclusive.value().xsdLiteral())
 
-if __name__ == '__main__':
+class TestTrac0231(unittest.TestCase):
+    def testFacets(self):
+        self.assertEqual(
+            "2010-01-01T00:00:00Z", rDateTime._CF_minInclusive.value().xsdLiteral()
+        )
+        self.assertEqual("2010-01-01", rDate._CF_minInclusive.value().xsdLiteral())
+        self.assertEqual("--01-01", rGmonthDay._CF_minInclusive.value().xsdLiteral())
+        self.assertEqual("00:00:00Z", rTime._CF_minInclusive.value().xsdLiteral())
+        self.assertEqual("2340.0", rDecimal._CF_maxInclusive.value().xsdLiteral())
+
+
+if __name__ == "__main__":
     unittest.main()

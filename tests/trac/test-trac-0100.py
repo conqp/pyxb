@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -9,7 +10,8 @@ from pyxb.utils import six
 from xml.dom import Node
 
 import os.path
-xsd='''<?xml version="1.0" encoding="UTF-8"?>
+
+xsd = """<?xml version="1.0" encoding="UTF-8"?>
  <schema xmlns="http://www.w3.org/2001/XMLSchema"
  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     version="1.0" targetNamespace="http://www.example.com/test"
@@ -31,26 +33,31 @@ xsd='''<?xml version="1.0" encoding="UTF-8"?>
       </complexContent>
     </complexType>
   </element>
-</schema>'''
+</schema>"""
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#open('code.py', 'w').write(code)
+# open('code.py', 'w').write(code)
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
 
 import unittest
 
-class TestTrac0100 (unittest.TestCase):
-    xmls_base = '<tgt:Notification xmlns:tgt="http://www.example.com/test" attrib1="text"/>'
-    def testBasic (self):
+
+class TestTrac0100(unittest.TestCase):
+    xmls_base = (
+        '<tgt:Notification xmlns:tgt="http://www.example.com/test" attrib1="text"/>'
+    )
+
+    def testBasic(self):
         instance = CreateFromDocument(self.xmls_base)
         self.assertEqual(instance.attrib1, "text")
 
     xmls_wc = '<tgt:Notification xmlns:tgt="http://www.example.com/test" attrib2="text2" xmlns:other="urn:other" other:attrib3="text3"/>'
-    def testWildcard (self):
+
+    def testWildcard(self):
         instance = CreateFromDocument(self.xmls_wc)
         self.assertEqual(instance.attrib1, None)
         self.assertEqual(instance.attrib2, "text2")
@@ -62,5 +69,5 @@ class TestTrac0100 (unittest.TestCase):
         self.assertEqual(val, "text3")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

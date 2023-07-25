@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -13,16 +14,18 @@ from pyxb.exceptions_ import *
 
 import unittest
 
-class TestIssue0043 (unittest.TestCase):
-    def testFloat (self):
-        self.assertEqual('INF', xs.float('Infinity').xsdLiteral())
-        self.assertEqual('-INF', xs.float('-Infinity').xsdLiteral())
-        self.assertEqual('NaN', xs.float('nan').xsdLiteral())
 
-    def testDouble (self):
-        self.assertEqual('INF', xs.double('Infinity').xsdLiteral())
-        self.assertEqual('-INF', xs.double('-Infinity').xsdLiteral())
-        self.assertEqual('NaN', xs.double('nan').xsdLiteral())
+class TestIssue0043(unittest.TestCase):
+    def testFloat(self):
+        self.assertEqual("INF", xs.float("Infinity").xsdLiteral())
+        self.assertEqual("-INF", xs.float("-Infinity").xsdLiteral())
+        self.assertEqual("NaN", xs.float("nan").xsdLiteral())
 
-if __name__ == '__main__':
+    def testDouble(self):
+        self.assertEqual("INF", xs.double("Infinity").xsdLiteral())
+        self.assertEqual("-INF", xs.double("-Infinity").xsdLiteral())
+        self.assertEqual("NaN", xs.double("nan").xsdLiteral())
+
+
+if __name__ == "__main__":
     unittest.main()

@@ -5,18 +5,23 @@ import xml.dom.minidom
 import time
 import io
 
-xmld = open('ipo.xml', 'rb').read()
+xmld = open("ipo.xml", "rb").read()
 
 order = ipo.CreateFromDOM(xml.dom.minidom.parse(io.BytesIO(xmld)).documentElement)
 
-print('%s is sending %s %d thing(s):' % (order.billTo.name, order.shipTo.name, len(order.items.item)))
+print(
+    "%s is sending %s %d thing(s):"
+    % (order.billTo.name, order.shipTo.name, len(order.items.item))
+)
 for item in order.items.item:
-    print('  Quantity %d of %s at $%s' % (item.quantity, item.productName, item.USPrice))
+    print(
+        "  Quantity %d of %s at $%s" % (item.quantity, item.productName, item.USPrice)
+    )
 
 # Give Mary more
 try:
-    item.quantity = 100;
+    item.quantity = 100
 except pyxb.SimpleTypeValueError as e:
-    print('Too many: %s' % (e,))
-    item.quantity = 10;
-print('Increased quantity to %d' % (item.quantity,))
+    print("Too many: %s" % (e,))
+    item.quantity = 10
+print("Increased quantity to %d" % (item.quantity,))

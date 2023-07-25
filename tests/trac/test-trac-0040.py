@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -9,7 +10,8 @@ from xml.dom import Node
 import pyxb.binding.datatypes as xs
 
 import os.path
-xsd='''<?xml version="1.0" encoding="UTF-8"?>
+
+xsd = """<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:simpleType name="tEnum">
     <xs:restriction base="xs:string">
@@ -31,42 +33,47 @@ xsd='''<?xml version="1.0" encoding="UTF-8"?>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="aggregate" type="tAggregate"/>
-</xs:schema>'''
+</xs:schema>"""
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#open('code.py', 'w').write(code)
+# open('code.py', 'w').write(code)
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
 
 import unittest
 
-def SET_lu (instance, v):
+
+def SET_lu(instance, v):
     instance.lu = v
 
-class TestTrac0040 (unittest.TestCase):
+
+class TestTrac0040(unittest.TestCase):
     """Storage of non-plural simple lists broken"""
-    def testBasic (self):
+
+    def testBasic(self):
         instance = aggregate()
-        instance.lu = [1,'two',3]
+        instance.lu = [1, "two", 3]
         self.assertEqual(3, len(instance.lu))
         self.assertEqual(1, len(instance.orderedContent()))
         self.assertTrue(instance.validateBinding())
         # This is really the only thing that tests #40, but there
-        self.assertEqual(instance.lu.xsdLiteral(), '1 two 3')
+        self.assertEqual(instance.lu.xsdLiteral(), "1 two 3")
 
         # These also caught a missed TypeError to PyXBException conversion
         self.assertRaises(pyxb.SimpleTypeValueError, SET_lu, instance, 1)
-        self.assertRaises(pyxb.SimpleTypeValueError, SET_lu, instance, [[1,'two',3], ['two',3,4]])
+        self.assertRaises(
+            pyxb.SimpleTypeValueError, SET_lu, instance, [[1, "two", 3], ["two", 3, 4]]
+        )
 
-        instance = aggregate([1,'two',3])
+        instance = aggregate([1, "two", 3])
         self.assertEqual(3, len(instance.lu))
         self.assertEqual(1, len(instance.orderedContent()))
         self.assertTrue(instance.validateBinding())
 
-        instance = aggregate(lu=[1,'two',3])
+        instance = aggregate(lu=[1, "two", 3])
         self.assertEqual(3, len(instance.lu))
         self.assertEqual(1, len(instance.orderedContent()))
         self.assertTrue(instance.validateBinding())
@@ -74,7 +81,7 @@ class TestTrac0040 (unittest.TestCase):
         instance = aggregate()
         instance.lu = []
         instance.lu.append(1)
-        instance.lu.append('two')
+        instance.lu.append("two")
         instance.lu.append(3)
         self.assertEqual(3, len(instance.lu))
         # Yes, the content is a single value; the members of the
@@ -83,5 +90,5 @@ class TestTrac0040 (unittest.TestCase):
         self.assertTrue(instance.validateBinding())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

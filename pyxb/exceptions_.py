@@ -23,7 +23,8 @@ reference it below.
 import pyxb
 from pyxb.utils import six
 
-class PyXBException (Exception):
+
+class PyXBException(Exception):
     """Base class for exceptions that indicate a problem that the user should fix."""
 
     """The arguments passed to the exception constructor."""
@@ -36,7 +37,7 @@ class PyXBException (Exception):
     should be kept around so they're accessible generically."""
     _kw = None
 
-    def __init__ (self, *args, **kw):
+    def __init__(self, *args, **kw):
         """Create an exception indicating a PyXB-related problem.
 
         If no args are present, a default argument is taken from the
@@ -44,26 +45,32 @@ class PyXBException (Exception):
 
         @keyword message : Text to provide the user with information about the problem.
         """
-        if 0 == len(args) and 'message' in kw:
-            args = (kw.pop('message'),)
+        if 0 == len(args) and "message" in kw:
+            args = (kw.pop("message"),)
         self._args = args
         self._kw = kw
         super(PyXBException, self).__init__(*args)
 
     if six.PY2:
-        def _str_from_unicode (self):
+
+        def _str_from_unicode(self):
             return unicode(self).encode(pyxb._OutputEncoding)
 
-class PyXBVersionError (PyXBException):
+
+class PyXBVersionError(PyXBException):
     """Raised on import of a binding generated with a different version of PYXB"""
+
     pass
 
-class DOMGenerationError (PyXBException):
+
+class DOMGenerationError(PyXBException):
     """A non-validation error encountered converting bindings to DOM."""
+
     pass
+
 
 @six.python_2_unicode_compatible
-class UnboundElementError (DOMGenerationError):
+class UnboundElementError(DOMGenerationError):
     """An instance converting to DOM had no bound element."""
 
     instance = None
@@ -71,127 +78,167 @@ class UnboundElementError (DOMGenerationError):
     L{pyxb.binding.basis._TypeBinding_mixin._element}) and no
     C{element_name} was passed."""
 
-    def __init__ (self, instance):
+    def __init__(self, instance):
         super(UnboundElementError, self).__init__(instance)
         self.instance = instance
 
-    def __str__ (self):
-        return six.u('Instance of type %s has no bound element for start tag') % (self.instance._diagnosticName(),)
+    def __str__(self):
+        return six.u("Instance of type %s has no bound element for start tag") % (
+            self.instance._diagnosticName(),
+        )
 
-class SchemaValidationError (PyXBException):
+
+class SchemaValidationError(PyXBException):
     """Raised when the XML hierarchy does not appear to be valid for an XML schema."""
+
     pass
 
-class NamespaceError (PyXBException):
+
+class NamespaceError(PyXBException):
     """Violation of some rule relevant to XML Namespaces"""
-    def __init__ (self, namespace, *args, **kw):
+
+    def __init__(self, namespace, *args, **kw):
         PyXBException.__init__(self, *args, **kw)
         self.__namespace = namespace
 
-    def namespace (self): return self.__namespace
+    def namespace(self):
+        return self.__namespace
 
-class NamespaceArchiveError (PyXBException):
+
+class NamespaceArchiveError(PyXBException):
     """Problem related to namespace archives"""
+
     pass
 
-class SchemaUniquenessError (PyXBException):
+
+class SchemaUniquenessError(PyXBException):
     """Raised when somebody tries to create a schema component using a
     schema that has already been used in that namespace.  Import and
     include processing would have avoided this, so somebody asked for
     it specifically."""
-    def __init__ (self, namespace, schema_location, existing_schema, *args, **kw):
+
+    def __init__(self, namespace, schema_location, existing_schema, *args, **kw):
         super(SchemaUniquenessError, self).__init__(*args, **kw)
         self.__namespace = namespace
         self.__schemaLocation = schema_location
         self.__existingSchema = existing_schema
 
-    def namespace (self): return self.__namespace
-    def schemaLocation (self): return self.__schemaLocation
-    def existingSchema (self): return self.__existingSchema
+    def namespace(self):
+        return self.__namespace
 
-class BindingGenerationError (PyXBException):
+    def schemaLocation(self):
+        return self.__schemaLocation
+
+    def existingSchema(self):
+        return self.__existingSchema
+
+
+class BindingGenerationError(PyXBException):
     """Raised when something goes wrong generating the binding classes"""
+
     pass
 
-class NamespaceUniquenessError (NamespaceError):
+
+class NamespaceUniquenessError(NamespaceError):
     """Raised when an attempt is made to record multiple objects of the same name in the same namespace category."""
+
     pass
 
-class NotInNamespaceError (PyXBException):
-    '''Raised when a name is referenced that is not defined in the appropriate namespace.'''
+
+class NotInNamespaceError(PyXBException):
+    """Raised when a name is referenced that is not defined in the appropriate namespace."""
+
     __namespace = None
     __ncName = None
 
-class QNameResolutionError (NamespaceError):
-    '''Raised when a QName cannot be associated with a namespace.'''
+
+class QNameResolutionError(NamespaceError):
+    """Raised when a QName cannot be associated with a namespace."""
+
     namespaceContext = None
     qname = None
 
-    def __init__ (self, message, qname, xmlns_context):
+    def __init__(self, message, qname, xmlns_context):
         self.qname = qname
         self.namespaceContext = xmlns_context
         super(QNameResolutionError, self).__init__(message, qname, xmlns_context)
 
-class BadDocumentError (PyXBException):
+
+class BadDocumentError(PyXBException):
     """Raised when processing document content and an error is encountered."""
+
     pass
 
-class StructuralBadDocumentError (BadDocumentError):
+
+class StructuralBadDocumentError(BadDocumentError):
     """Raised when processing document and the content model is not satisfied."""
+
     @property
-    def element_use (self):
+    def element_use(self):
         """The L{pyxb.binding.content.ElementDeclaration} instance to which the content should conform, if available."""
         return self.__elementUse
 
     @property
-    def container (self):
+    def container(self):
         """The L{pyxb.binding.basis.complexTypeDefinition} instance to which the content would belong, if available."""
         return self.__container
 
     @property
-    def content (self):
+    def content(self):
         """The value which could not be reconciled with the content model."""
         return self.__content
 
-    def __init__ (self, *args, **kw):
+    def __init__(self, *args, **kw):
         """Raised when processing document and the content model is not satisfied.
 
         @keyword content : The value that could not be reconciled with the content model
         @keyword container : Optional binding instance into which the content was to be assigned
         @keyword element_use : Optional reference to an element use identifying the element to which the value was to be reconciled
         """
-        self.__content = kw.pop('content', None)
+        self.__content = kw.pop("content", None)
         if args:
             self.__content = args[0]
-        self.__container = kw.pop('container', None)
-        self.__elementUse = kw.pop('element_use', None)
+        self.__container = kw.pop("container", None)
+        self.__elementUse = kw.pop("element_use", None)
         if self.__content is not None:
             if self.__container is not None:
-                kw.setdefault('message', '%s cannot accept wildcard content %s' % (self.__container._Name(), self.__content))
+                kw.setdefault(
+                    "message",
+                    "%s cannot accept wildcard content %s"
+                    % (self.__container._Name(), self.__content),
+                )
             elif self.__elementUse is not None:
-                kw.setdefault('message', '%s not consistent with content model for %s' % (self.__content, self.__elementUse))
+                kw.setdefault(
+                    "message",
+                    "%s not consistent with content model for %s"
+                    % (self.__content, self.__elementUse),
+                )
             else:
-                kw.setdefault('message', six.text_type(self.__content))
+                kw.setdefault("message", six.text_type(self.__content))
         BadDocumentError.__init__(self, **kw)
 
-class UnrecognizedDOMRootNodeError (StructuralBadDocumentError):
+
+class UnrecognizedDOMRootNodeError(StructuralBadDocumentError):
     """A root DOM node could not be resolved to a schema element"""
 
     node = None
     """The L{xml.dom.Element} instance that could not be recognized"""
 
-    def __get_node_name (self):
+    def __get_node_name(self):
         """The QName of the L{node} as a L{pyxb.namespace.ExpandedName}"""
         import pyxb.namespace
-        return  pyxb.namespace.ExpandedName(self.node.namespaceURI, self.node.localName)
+
+        return pyxb.namespace.ExpandedName(self.node.namespaceURI, self.node.localName)
+
     node_name = property(__get_node_name)
 
-    def __init__ (self, node):
+    def __init__(self, node):
         """@param node: the value for the L{node} attribute."""
         self.node = node
         super(UnrecognizedDOMRootNodeError, self).__init__(node)
 
-class ValidationError (PyXBException):
+
+class ValidationError(PyXBException):
     """Raised when something in the infoset fails to satisfy a content model or attribute requirement.
 
     All validation errors include a L{location} attribute which shows
@@ -206,7 +253,7 @@ class ValidationError (PyXBException):
     available.  This will be C{None}, or an instance of
     L{pyxb.utils.utility.Location}."""
 
-    def details (self):
+    def details(self):
         """Provide information describing why validation failed.
 
         In many cases, this is simply the informal string content that
@@ -218,8 +265,9 @@ class ValidationError (PyXBException):
         @return: a string description of validation failure"""
         return six.text_type(self)
 
+
 @six.python_2_unicode_compatible
-class NonElementValidationError (ValidationError):
+class NonElementValidationError(ValidationError):
     """Raised when an element (or a value bound to an element) appears
     in context that does not permit an element."""
 
@@ -228,47 +276,53 @@ class NonElementValidationError (ValidationError):
     a DOM representation that would have been made into an element had
     matters progressed further."""
 
-    def __init__ (self, element, location=None):
+    def __init__(self, element, location=None):
         """@param element: the value for the L{element} attribute.
         @param location: the value for the L{location} attribute.
         """
         self.element = element
-        if (location is None) and isinstance(element, pyxb.utils.utility.Locatable_mixin):
+        if (location is None) and isinstance(
+            element, pyxb.utils.utility.Locatable_mixin
+        ):
             location = element._location()
         self.location = location
         super(NonElementValidationError, self).__init__(element, location)
 
-    def __str__ (self):
+    def __str__(self):
         import pyxb.binding.basis
         import xml.dom
-        value = ''
-        boundto = ''
-        location = ''
+
+        value = ""
+        boundto = ""
+        location = ""
         if isinstance(self.element, pyxb.binding.basis._TypeBinding_mixin):
             eb = self.element._element()
-            boundto = ''
+            boundto = ""
             if eb is not None:
-                boundto = ' bound to %s' % (eb.name(),)
+                boundto = " bound to %s" % (eb.name(),)
             if isinstance(self.element, pyxb.binding.basis.simpleTypeDefinition):
                 value = self.element.xsdLiteral()
             elif self.element._IsSimpleTypeContent():
                 value = six.text_type(self.element.value())
             else:
-                value = 'Complex value'
+                value = "Complex value"
         elif isinstance(self.element, xml.dom.Node):
-            value = 'DOM node %s' % (self.element.nodeName,)
+            value = "DOM node %s" % (self.element.nodeName,)
         else:
-            value = '%s type %s' % (six.text_type(self.element), type(self.element))
+            value = "%s type %s" % (six.text_type(self.element), type(self.element))
         if self.location is not None:
-            location = ' at %s' % (self.location,)
-        return six.u('%s%s not permitted%s') % (value, boundto, location)
+            location = " at %s" % (self.location,)
+        return six.u("%s%s not permitted%s") % (value, boundto, location)
 
-class ElementValidationError (ValidationError):
+
+class ElementValidationError(ValidationError):
     """Raised when a validation requirement for an element is not satisfied."""
+
     pass
 
+
 @six.python_2_unicode_compatible
-class AbstractElementError (ElementValidationError):
+class AbstractElementError(ElementValidationError):
     """Attempt to create an instance of an abstract element.
 
     Raised when an element is created and the identified binding is
@@ -292,7 +346,7 @@ class AbstractElementError (ElementValidationError):
     L{pyxb.binding.content.ElementDeclaration.toDOM} is
     mis-used."""
 
-    def __init__ (self, element, location, value=None):
+    def __init__(self, element, location, value=None):
         """@param element: the value for the L{element} attribute.
         @param location: the value for the L{location} attribute.
         @param value: the value for the L{value} attribute."""
@@ -301,11 +355,14 @@ class AbstractElementError (ElementValidationError):
         self.value = value
         super(AbstractElementError, self).__init__(element, location, value)
 
-    def __str__ (self):
-        return six.u('Cannot instantiate abstract element %s directly') % (self.element.name(),)
+    def __str__(self):
+        return six.u("Cannot instantiate abstract element %s directly") % (
+            self.element.name(),
+        )
+
 
 @six.python_2_unicode_compatible
-class ContentInNilInstanceError (ElementValidationError):
+class ContentInNilInstanceError(ElementValidationError):
     """Raised when an element that is marked to be nil is assigned content."""
 
     instance = None
@@ -314,10 +371,11 @@ class ContentInNilInstanceError (ElementValidationError):
     content = None
     """The content that was to be assigned to the instance."""
 
-    def __init__ (self, instance, content, location=None):
+    def __init__(self, instance, content, location=None):
         """@param instance: the value for the L{instance} attribute.
         @param content: the value for the L{content} attribute.
-        @param location: the value for the L{location} attribute.  Default taken from C{instance} if possible."""
+        @param location: the value for the L{location} attribute.  Default taken from C{instance} if possible.
+        """
 
         self.instance = instance
         self.content = content
@@ -326,27 +384,34 @@ class ContentInNilInstanceError (ElementValidationError):
         self.location = location
         super(ContentInNilInstanceError, self).__init__(instance, content, location)
 
-    def __str__ (self):
+    def __str__(self):
         from pyxb.namespace.builtin import XMLSchema_instance as XSI
-        return six.u('%s with %s=true cannot have content') % (self.instance._diagnosticName(), XSI.nil)
 
-class NoNillableSupportError (ElementValidationError):
+        return six.u("%s with %s=true cannot have content") % (
+            self.instance._diagnosticName(),
+            XSI.nil,
+        )
+
+
+class NoNillableSupportError(ElementValidationError):
     """Raised when invoking L{_setIsNil<pyxb.binding.basis._TypeBinding_mixin._setIsNil>} on a type that does not support nillable."""
 
     instance = None
     """The binding instance on which an inappropriate operation was invoked."""
 
-    def __init__ (self, instance, location=None):
+    def __init__(self, instance, location=None):
         """@param instance: the value for the L{instance} attribute.
-        @param location: the value for the L{location} attribute.  Default taken from C{instance} if possible."""
+        @param location: the value for the L{location} attribute.  Default taken from C{instance} if possible.
+        """
         self.instance = instance
         if location is None:
             location = self.instance._location()
         self.location = location
         super(NoNillableSupportError, self).__init__(instance, location)
 
+
 @six.python_2_unicode_compatible
-class ElementChangeError (ElementValidationError):
+class ElementChangeError(ElementValidationError):
     """Attempt to change an element that has a fixed value constraint."""
 
     element = None
@@ -355,12 +420,14 @@ class ElementChangeError (ElementValidationError):
     value = None
     """The value that was to be assigned to the element."""
 
-    def __init__ (self, element, value, location=None):
+    def __init__(self, element, value, location=None):
         """@param element: the value for the L{element} attribute.
         @param value: the value for the L{value} attribute.
-        @param location: the value for the L{location} attribute.  Default taken from C{value} if possible."""
+        @param location: the value for the L{location} attribute.  Default taken from C{value} if possible.
+        """
 
         import pyxb.utils.utility
+
         self.element = element
         self.value = value
         if (location is None) and isinstance(value, pyxb.utils.utility.Locatable_mixin):
@@ -368,15 +435,21 @@ class ElementChangeError (ElementValidationError):
         self.location = location
         super(ElementChangeError, self).__init__(element, value, location)
 
-    def __str__ (self):
-        return six.u('Value %s for element %s incompatible with fixed content') % (self.value, self.element.name())
+    def __str__(self):
+        return six.u("Value %s for element %s incompatible with fixed content") % (
+            self.value,
+            self.element.name(),
+        )
 
-class ComplexTypeValidationError (ValidationError):
+
+class ComplexTypeValidationError(ValidationError):
     """Raised when a validation requirement for a complex type is not satisfied."""
+
     pass
 
+
 @six.python_2_unicode_compatible
-class AbstractInstantiationError (ComplexTypeValidationError):
+class AbstractInstantiationError(ComplexTypeValidationError):
     """Attempt to create an instance of an abstract complex type.
 
     These types are analogous to abstract base classes, and cannot be
@@ -397,7 +470,7 @@ class AbstractInstantiationError (ComplexTypeValidationError):
     node = None
     """The L{xml.dom.Element} from which instantiation was attempted, if available."""
 
-    def __init__ (self, type, location, node):
+    def __init__(self, type, location, node):
         """@param type: the value for the L{type} attribute.
         @param location: the value for the L{location} attribute.
         @param node: the value for the L{node} attribute."""
@@ -406,12 +479,15 @@ class AbstractInstantiationError (ComplexTypeValidationError):
         self.node = node
         super(AbstractInstantiationError, self).__init__(type, location, node)
 
-    def __str__ (self):
+    def __str__(self):
         # If the type is abstract, it has to have a name.
-        return six.u('Cannot instantiate abstract type %s directly') % (self.type._ExpandedName,)
+        return six.u("Cannot instantiate abstract type %s directly") % (
+            self.type._ExpandedName,
+        )
+
 
 @six.python_2_unicode_compatible
-class AttributeOnSimpleTypeError (ComplexTypeValidationError):
+class AttributeOnSimpleTypeError(ComplexTypeValidationError):
     """Attempt made to set an attribute on an element with simple type.
 
     Note that elements with complex type and simple content may have
@@ -426,11 +502,12 @@ class AttributeOnSimpleTypeError (ComplexTypeValidationError):
     value = None
     """The value proposed to be assigned to the non-existent attribute."""
 
-    def __init__ (self, instance, tag, value, location=None):
+    def __init__(self, instance, tag, value, location=None):
         """@param instance: the value for the L{instance} attribute.
         @param tag: the value for the L{tag} attribute.
         @param value: the value for the L{value} attribute.
-        @param location: the value for the L{location} attribute.  Default taken from C{instance} if possible."""
+        @param location: the value for the L{location} attribute.  Default taken from C{instance} if possible.
+        """
 
         self.instance = instance
         self.tag = tag
@@ -440,47 +517,55 @@ class AttributeOnSimpleTypeError (ComplexTypeValidationError):
         self.location = location
         super(AttributeOnSimpleTypeError, self).__init__(instance, tag, value, location)
 
-    def __str__ (self):
-        return six.u('Simple type %s cannot support attribute %s') % (self.instance._Name(), self.tag)
+    def __str__(self):
+        return six.u("Simple type %s cannot support attribute %s") % (
+            self.instance._Name(),
+            self.tag,
+        )
 
-class ContentValidationError (ComplexTypeValidationError):
+
+class ContentValidationError(ComplexTypeValidationError):
     """Violation of a complex type content model."""
+
     pass
 
+
 @six.python_2_unicode_compatible
-class ContentNondeterminismExceededError (ContentValidationError):
+class ContentNondeterminismExceededError(ContentValidationError):
     """Content validation exceeded the allowed limits of nondeterminism."""
 
     instance = None
     """The binding instance being validated."""
 
-    def __init__ (self, instance):
+    def __init__(self, instance):
         """@param instance: the value for the L{instance} attribute."""
         self.instance = instance
         super(ContentNondeterminismExceededError, self).__init__(instance)
 
-    def __str__ (self):
-        return six.u('Nondeterminism exceeded validating %s') % (self.instance._Name(),)
+    def __str__(self):
+        return six.u("Nondeterminism exceeded validating %s") % (self.instance._Name(),)
+
 
 @six.python_2_unicode_compatible
-class SimpleContentAbsentError (ContentValidationError):
+class SimpleContentAbsentError(ContentValidationError):
     """An instance with simple content was not provided with a value."""
 
     instance = None
     """The binding instance for which simple content is missing."""
 
-    def __init__ (self, instance, location):
+    def __init__(self, instance, location):
         """@param instance: the value for the L{instance} attribute.
         @param location: the value for the L{location} attribute."""
         self.instance = instance
         self.location = location
         super(SimpleContentAbsentError, self).__init__(instance, location)
 
-    def __str__ (self):
-        return six.u('Type %s requires content') % (self.instance._Name(),)
+    def __str__(self):
+        return six.u("Type %s requires content") % (self.instance._Name(),)
+
 
 @six.python_2_unicode_compatible
-class ExtraSimpleContentError (ContentValidationError):
+class ExtraSimpleContentError(ContentValidationError):
     """A complex type with simple content was provided too much content."""
 
     instance = None
@@ -489,7 +574,7 @@ class ExtraSimpleContentError (ContentValidationError):
     value = None
     """The proposed addition to that simple content."""
 
-    def __init__ (self, instance, value, location=None):
+    def __init__(self, instance, value, location=None):
         """@param instance: the value for the L{instance} attribute.
         @param value: the value for the L{value} attribute.
         @param location: the value for the L{location} attribute."""
@@ -498,11 +583,14 @@ class ExtraSimpleContentError (ContentValidationError):
         self.location = location
         super(ExtraSimpleContentError, self).__init__(instance, value, location)
 
-    def __str__ (self):
-        return six.u('Instance of %s already has simple content value assigned') % (self.instance._Name(),)
+    def __str__(self):
+        return six.u("Instance of %s already has simple content value assigned") % (
+            self.instance._Name(),
+        )
+
 
 @six.python_2_unicode_compatible
-class NonPluralAppendError (ContentValidationError):
+class NonPluralAppendError(ContentValidationError):
     """Attempt to append to an element which does not accept multiple instances."""
 
     instance = None
@@ -514,7 +602,7 @@ class NonPluralAppendError (ContentValidationError):
     value = None
     """The proposed addition to the element in the instance"""
 
-    def __init__ (self, instance, element_declaration, value):
+    def __init__(self, instance, element_declaration, value):
         """@param instance: the value for the L{instance} attribute.
         @param element_declaration: the value for the L{element_declaration} attribute.
         @param value: the value for the L{value} attribute."""
@@ -523,11 +611,15 @@ class NonPluralAppendError (ContentValidationError):
         self.value = value
         super(NonPluralAppendError, self).__init__(instance, element_declaration, value)
 
-    def __str__ (self):
-        return six.u('Instance of %s cannot append to element %s') % (self.instance._Name(), self.element_declaration.name())
+    def __str__(self):
+        return six.u("Instance of %s cannot append to element %s") % (
+            self.instance._Name(),
+            self.element_declaration.name(),
+        )
+
 
 @six.python_2_unicode_compatible
-class MixedContentError (ContentValidationError):
+class MixedContentError(ContentValidationError):
     """Non-element content added to a complex type instance that does not support mixed content."""
 
     instance = None
@@ -536,7 +628,7 @@ class MixedContentError (ContentValidationError):
     value = None
     """The non-element content."""
 
-    def __init__ (self, instance, value, location=None):
+    def __init__(self, instance, value, location=None):
         """@param instance: the value for the L{instance} attribute.
         @param value: the value for the L{value} attribute.
         @param location: the value for the L{location} attribute."""
@@ -545,13 +637,14 @@ class MixedContentError (ContentValidationError):
         self.location = location
         super(MixedContentError, self).__init__(instance, value, location)
 
-    def __str__ (self):
+    def __str__(self):
         if self.location is not None:
-            return six.u('Invalid non-element content at %s') % (self.location,)
-        return six.u('Invalid non-element content')
+            return six.u("Invalid non-element content at %s") % (self.location,)
+        return six.u("Invalid non-element content")
+
 
 @six.python_2_unicode_compatible
-class UnprocessedKeywordContentError (ContentValidationError):
+class UnprocessedKeywordContentError(ContentValidationError):
     """A complex type constructor was provided with keywords that could not be recognized."""
 
     instance = None
@@ -562,19 +655,25 @@ class UnprocessedKeywordContentError (ContentValidationError):
     intended to be attributes or elements, but cannot be identified as
     either."""
 
-    def __init__ (self, instance, keywords, location=None):
+    def __init__(self, instance, keywords, location=None):
         """@param instance: the value for the L{instance} attribute.
         @param keywords: the value for the L{keywords} attribute.
         @param location: the value for the L{location} attribute."""
         self.instance = instance
         self.keywords = keywords
         self.location = location
-        super(UnprocessedKeywordContentError, self).__init__(instance, keywords, location)
+        super(UnprocessedKeywordContentError, self).__init__(
+            instance, keywords, location
+        )
 
-    def __str__ (self):
-        return six.u('Unprocessed keywords instantiating %s: %s') % (self.instance._Name(), ' '.join(six.iterkeys(self.keywords)))
+    def __str__(self):
+        return six.u("Unprocessed keywords instantiating %s: %s") % (
+            self.instance._Name(),
+            " ".join(six.iterkeys(self.keywords)),
+        )
 
-class IncrementalElementContentError (ContentValidationError):
+
+class IncrementalElementContentError(ContentValidationError):
     """Element or element-like content could not be validly associated with an sub-element in the content model.
 
     This exception occurs when content is added to an element during
@@ -591,7 +690,7 @@ class IncrementalElementContentError (ContentValidationError):
     value = None
     """The value that could not be associated with allowable content."""
 
-    def __init__ (self, instance, automaton_configuration, value, location=None):
+    def __init__(self, instance, automaton_configuration, value, location=None):
         """@param instance: the value for the L{instance} attribute.
         @param automaton_configuration: the value for the L{automaton_configuration} attribute.
         @param value: the value for the L{value} attribute.
@@ -600,29 +699,35 @@ class IncrementalElementContentError (ContentValidationError):
         self.automaton_configuration = automaton_configuration
         self.value = value
         self.location = location
-        super(IncrementalElementContentError, self).__init__(instance, automaton_configuration, value, location)
+        super(IncrementalElementContentError, self).__init__(
+            instance, automaton_configuration, value, location
+        )
 
-    def _valueDescription (self):
+    def _valueDescription(self):
         import xml.dom
+
         if isinstance(self.value, pyxb.binding.basis._TypeBinding_mixin):
             return self.value._diagnosticName()
         if isinstance(self.value, xml.dom.Node):
             return self.value.nodeName
         return six.text_type(self.value)
 
+
 @six.python_2_unicode_compatible
-class UnrecognizedContentError (IncrementalElementContentError):
+class UnrecognizedContentError(IncrementalElementContentError):
     """Element or element-like content could not be validly associated with an sub-element in the content model.
 
-    This exception occurs when content is added to an element during incremental validation."""
+    This exception occurs when content is added to an element during incremental validation.
+    """
 
-    def __str__ (self):
+    def __str__(self):
         value = self._valueDescription()
         acceptable = self.automaton_configuration.acceptableContent()
         if 0 == acceptable:
-            expect = 'no more content'
+            expect = "no more content"
         else:
             import pyxb.binding.content
+
             seen = set()
             names = []
             for u in acceptable:
@@ -630,47 +735,70 @@ class UnrecognizedContentError (IncrementalElementContentError):
                     n = six.text_type(u.elementBinding().name())
                 else:
                     assert isinstance(u, pyxb.binding.content.WildcardUse)
-                    n = 'xs:any'
+                    n = "xs:any"
                 if not (n in seen):
                     names.append(n)
                     seen.add(n)
-            expect = ' or '.join(names)
-        location = ''
+            expect = " or ".join(names)
+        location = ""
         if self.location is not None:
-            location = ' at %s' % (self.location,)
-        return six.u('Invalid content %s%s (expect %s)') % (value, location, expect)
+            location = " at %s" % (self.location,)
+        return six.u("Invalid content %s%s (expect %s)") % (value, location, expect)
 
-    def details (self):
+    def details(self):
         import pyxb.binding.basis
         import pyxb.binding.content
+
         i = self.instance
-        rv = [ ]
+        rv = []
         if i._element() is not None:
-            rv.append('The containing element %s is defined at %s.' % (i._element().name(), i._element().xsdLocation()))
-        rv.append('The containing element type %s is defined at %s' % (self.instance._Name(), six.text_type(self.instance._XSDLocation)))
+            rv.append(
+                "The containing element %s is defined at %s."
+                % (i._element().name(), i._element().xsdLocation())
+            )
+        rv.append(
+            "The containing element type %s is defined at %s"
+            % (self.instance._Name(), six.text_type(self.instance._XSDLocation))
+        )
         if self.location is not None:
-            rv.append('The unrecognized content %s begins at %s' % (self._valueDescription(), self.location))
+            rv.append(
+                "The unrecognized content %s begins at %s"
+                % (self._valueDescription(), self.location)
+            )
         else:
-            rv.append('The unrecognized content is %s' % (self._valueDescription(),))
-        rv.append('The %s automaton %s in an accepting state.' % (self.instance._Name(), self.automaton_configuration.isAccepting() and "is" or "is not"))
-        if isinstance(self.instance, pyxb.binding.basis.complexTypeDefinition) and self.instance._IsMixed():
-            rv.append('Character information content would be permitted.')
+            rv.append("The unrecognized content is %s" % (self._valueDescription(),))
+        rv.append(
+            "The %s automaton %s in an accepting state."
+            % (
+                self.instance._Name(),
+                self.automaton_configuration.isAccepting() and "is" or "is not",
+            )
+        )
+        if (
+            isinstance(self.instance, pyxb.binding.basis.complexTypeDefinition)
+            and self.instance._IsMixed()
+        ):
+            rv.append("Character information content would be permitted.")
         acceptable = self.automaton_configuration.acceptableContent()
         if 0 == len(acceptable):
-            rv.append('No elements or wildcards would be accepted at this point.')
+            rv.append("No elements or wildcards would be accepted at this point.")
         else:
-            rv.append('The following element and wildcard content would be accepted:')
+            rv.append("The following element and wildcard content would be accepted:")
             rv2 = []
             for u in acceptable:
                 if isinstance(u, pyxb.binding.content.ElementUse):
-                    rv2.append('An element %s per %s' % (u.elementBinding().name(), u.xsdLocation()))
+                    rv2.append(
+                        "An element %s per %s"
+                        % (u.elementBinding().name(), u.xsdLocation())
+                    )
                 else:
                     assert isinstance(u, pyxb.binding.content.WildcardUse)
-                    rv2.append('A wildcard per %s' % (u.xsdLocation(),))
-            rv.append('\t' + '\n\t'.join(rv2))
-        return '\n'.join(rv)
+                    rv2.append("A wildcard per %s" % (u.xsdLocation(),))
+            rv.append("\t" + "\n\t".join(rv2))
+        return "\n".join(rv)
 
-class BatchElementContentError (ContentValidationError):
+
+class BatchElementContentError(ContentValidationError):
     """Element/wildcard content cannot be reconciled with the required content model.
 
     This exception occurs in post-construction validation using a
@@ -688,7 +816,7 @@ class BatchElementContentError (ContentValidationError):
     symbol_set = None
     """The leftovers from L{pyxb.binding.basis.complexTypeDefinition._symbolSet} that could not be reconciled with the content model."""
 
-    def __init__ (self, instance, fac_configuration, symbols, symbol_set):
+    def __init__(self, instance, fac_configuration, symbols, symbol_set):
         """@param instance: the value for the L{instance} attribute.
         @param fac_configuration: the value for the L{fac_configuration} attribute.
         @param symbols: the value for the L{symbols} attribute.
@@ -697,70 +825,101 @@ class BatchElementContentError (ContentValidationError):
         self.fac_configuration = fac_configuration
         self.symbols = symbols
         self.symbol_set = symbol_set
-        super(BatchElementContentError, self).__init__(instance, fac_configuration, symbols, symbol_set)
+        super(BatchElementContentError, self).__init__(
+            instance, fac_configuration, symbols, symbol_set
+        )
 
-    def details (self):
+    def details(self):
         import pyxb.binding.basis
         import pyxb.binding.content
+
         i = self.instance
-        rv = [ ]
+        rv = []
         if i._element() is not None:
-            rv.append('The containing element %s is defined at %s.' % (i._element().name(), i._element().xsdLocation()))
-        rv.append('The containing element type %s is defined at %s' % (self.instance._Name(), six.text_type(self.instance._XSDLocation)))
-        rv.append('The %s automaton %s in an accepting state.' % (self.instance._Name(), self.fac_configuration.isAccepting() and "is" or "is not"))
+            rv.append(
+                "The containing element %s is defined at %s."
+                % (i._element().name(), i._element().xsdLocation())
+            )
+        rv.append(
+            "The containing element type %s is defined at %s"
+            % (self.instance._Name(), six.text_type(self.instance._XSDLocation))
+        )
+        rv.append(
+            "The %s automaton %s in an accepting state."
+            % (
+                self.instance._Name(),
+                self.fac_configuration.isAccepting() and "is" or "is not",
+            )
+        )
         if self.symbols is None:
-            rv.append('Any accepted content has been stored in instance')
+            rv.append("Any accepted content has been stored in instance")
         elif 0 == len(self.symbols):
-            rv.append('No content has been accepted')
+            rv.append("No content has been accepted")
         else:
-            rv.append('The last accepted content was %s' % (self.symbols[-1].value._diagnosticName(),))
-        if isinstance(self.instance, pyxb.binding.basis.complexTypeDefinition) and self.instance._IsMixed():
-            rv.append('Character information content would be permitted.')
+            rv.append(
+                "The last accepted content was %s"
+                % (self.symbols[-1].value._diagnosticName(),)
+            )
+        if (
+            isinstance(self.instance, pyxb.binding.basis.complexTypeDefinition)
+            and self.instance._IsMixed()
+        ):
+            rv.append("Character information content would be permitted.")
         acceptable = self.fac_configuration.acceptableSymbols()
         if 0 == len(acceptable):
-            rv.append('No elements or wildcards would be accepted at this point.')
+            rv.append("No elements or wildcards would be accepted at this point.")
         else:
-            rv.append('The following element and wildcard content would be accepted:')
+            rv.append("The following element and wildcard content would be accepted:")
             rv2 = []
             for u in acceptable:
                 if isinstance(u, pyxb.binding.content.ElementUse):
-                    rv2.append('An element %s per %s' % (u.elementBinding().name(), u.xsdLocation()))
+                    rv2.append(
+                        "An element %s per %s"
+                        % (u.elementBinding().name(), u.xsdLocation())
+                    )
                 else:
                     assert isinstance(u, pyxb.binding.content.WildcardUse)
-                    rv2.append('A wildcard per %s' % (u.xsdLocation(),))
-            rv.append('\t' + '\n\t'.join(rv2))
+                    rv2.append("A wildcard per %s" % (u.xsdLocation(),))
+            rv.append("\t" + "\n\t".join(rv2))
         if (self.symbol_set is None) or (0 == len(self.symbol_set)):
-            rv.append('No content remains unconsumed')
+            rv.append("No content remains unconsumed")
         else:
-            rv.append('The following content was not processed by the automaton:')
+            rv.append("The following content was not processed by the automaton:")
             rv2 = []
-            for (ed, syms) in six.iteritems(self.symbol_set):
+            for ed, syms in six.iteritems(self.symbol_set):
                 if ed is None:
-                    rv2.append('xs:any (%u instances)' % (len(syms),))
+                    rv2.append("xs:any (%u instances)" % (len(syms),))
                 else:
-                    rv2.append('%s (%u instances)' % (ed.name(), len(syms)))
-            rv.append('\t' + '\n\t'.join(rv2))
-        return '\n'.join(rv)
+                    rv2.append("%s (%u instances)" % (ed.name(), len(syms)))
+            rv.append("\t" + "\n\t".join(rv2))
+        return "\n".join(rv)
 
-class IncompleteElementContentError (BatchElementContentError):
+
+class IncompleteElementContentError(BatchElementContentError):
     """Validation of an instance failed to produce an accepting state.
 
     This exception occurs in batch-mode validation."""
+
     pass
 
-class UnprocessedElementContentError (BatchElementContentError):
+
+class UnprocessedElementContentError(BatchElementContentError):
     """Validation of an instance produced an accepting state but left element material unconsumed.
 
     This exception occurs in batch-mode validation."""
+
     pass
 
-class InvalidPreferredElementContentError (BatchElementContentError):
+
+class InvalidPreferredElementContentError(BatchElementContentError):
     """Use of a preferred element led to inability to generate a valid document"""
 
     preferred_symbol = None
     """The element symbol which was not accepted."""
 
-    def __init__ (self, instance, fac_configuration, symbols, symbol_set, preferred_symbol):
+    def __init__(
+        self, instance, fac_configuration, symbols, symbol_set, preferred_symbol
+    ):
         """@param instance: the value for the L{instance} attribute.
         @param fac_configuration: the value for the L{fac_configuration} attribute.
         @param symbols: the value for the L{symbols} attribute.
@@ -773,10 +932,13 @@ class InvalidPreferredElementContentError (BatchElementContentError):
         self.symbol_set = symbol_set
         self.preferred_symbol = preferred_symbol
         # Bypass immediate parent so we preserve the last argument
-        super(BatchElementContentError, self).__init__(instance, fac_configuration, symbols, symbol_set, preferred_symbol)
+        super(BatchElementContentError, self).__init__(
+            instance, fac_configuration, symbols, symbol_set, preferred_symbol
+        )
+
 
 @six.python_2_unicode_compatible
-class OrphanElementContentError (ContentValidationError):
+class OrphanElementContentError(ContentValidationError):
     """An element expected to be used in content is not present in the instance.
 
     This exception occurs in batch-mode validation when
@@ -793,7 +955,7 @@ class OrphanElementContentError (ContentValidationError):
     preferred = None
     """An element value from the L{instance} L{content<pyxb.binding.basis.complexTypeDefinition.content>} list which was not found in the L{instance}."""
 
-    def __init__ (self, instance, preferred):
+    def __init__(self, instance, preferred):
         """@param instance: the value for the L{instance} attribute.
         @param preferred: the value for the L{preferred} attribute.
         """
@@ -801,12 +963,14 @@ class OrphanElementContentError (ContentValidationError):
         self.preferred = preferred
         super(OrphanElementContentError, self).__init__(instance, preferred)
 
-    def __str__ (self):
-        return six.u('Preferred content element not found in instance')
+    def __str__(self):
+        return six.u("Preferred content element not found in instance")
+
 
 @six.python_2_unicode_compatible
-class SimpleTypeValueError (ValidationError):
+class SimpleTypeValueError(ValidationError):
     """Raised when a simple type value does not satisfy its constraints."""
+
     type = None
     """The L{pyxb.binding.basis.simpleTypeDefinition} that constrains values."""
 
@@ -816,11 +980,13 @@ class SimpleTypeValueError (ValidationError):
     failed with a built-in exception likeC{ValueError} or
     C{OverflowError}."""
 
-    def __init__ (self, type, value, location=None):
+    def __init__(self, type, value, location=None):
         """@param type: the value for the L{type} attribute.
         @param value: the value for the L{value} attribute.
-        @param location: the value for the L{location} attribute.  Default taken from C{value} if possible."""
+        @param location: the value for the L{location} attribute.  Default taken from C{value} if possible.
+        """
         import pyxb.utils.utility
+
         self.type = type
         self.value = value
         if (location is None) and isinstance(value, pyxb.utils.utility.Locatable_mixin):
@@ -828,25 +994,39 @@ class SimpleTypeValueError (ValidationError):
         self.location = location
         super(SimpleTypeValueError, self).__init__(type, value, location)
 
-    def __str__ (self):
+    def __str__(self):
         import pyxb.binding.basis
+
         if isinstance(self.value, pyxb.binding.basis._TypeBinding_mixin):
-            return six.u('Type %s cannot be created from %s: %s') % (self.type._Name(), self.value._Name(), self.value)
-        return six.u('Type %s cannot be created from: %s') % (self.type._Name(), self.value)
+            return six.u("Type %s cannot be created from %s: %s") % (
+                self.type._Name(),
+                self.value._Name(),
+                self.value,
+            )
+        return six.u("Type %s cannot be created from: %s") % (
+            self.type._Name(),
+            self.value,
+        )
+
 
 @six.python_2_unicode_compatible
-class SimpleListValueError (SimpleTypeValueError):
+class SimpleListValueError(SimpleTypeValueError):
     """Raised when a list simple type contains a member that does not satisfy its constraints.
 
     In this case, L{type} is the type of the list, and value
     C{type._ItemType} is the type for which the L{value} is
     unacceptable."""
 
-    def __str__ (self):
-        return six.u('Member type %s of list type %s cannot accept %s') % (self.type._ItemType._Name(), self.type._Name(), self.value)
+    def __str__(self):
+        return six.u("Member type %s of list type %s cannot accept %s") % (
+            self.type._ItemType._Name(),
+            self.type._Name(),
+            self.value,
+        )
+
 
 @six.python_2_unicode_compatible
-class SimpleUnionValueError (SimpleTypeValueError):
+class SimpleUnionValueError(SimpleTypeValueError):
     """Raised when a union simple type contains a member that does not satisfy its constraints.
 
     In this case, L{type} is the type of the union, and the value
@@ -856,11 +1036,15 @@ class SimpleUnionValueError (SimpleTypeValueError):
     The L{value} itself is the tuple of arguments passed to the
     constructor for the union."""
 
-    def __str__ (self):
-        return six.u('No memberType of %s can be constructed from %s') % (self.type._Name(), self.value)
+    def __str__(self):
+        return six.u("No memberType of %s can be constructed from %s") % (
+            self.type._Name(),
+            self.value,
+        )
+
 
 @six.python_2_unicode_compatible
-class SimpleFacetValueError (SimpleTypeValueError):
+class SimpleFacetValueError(SimpleTypeValueError):
     """Raised when a simple type value does not satisfy a facet constraint.
 
     This extends L{SimpleTypeValueError} with the L{facet} field which
@@ -878,11 +1062,12 @@ class SimpleFacetValueError (SimpleTypeValueError):
     facet = None
     """The specific facet that is violated by the value."""
 
-    def __init__ (self, type, value, facet, location=None):
+    def __init__(self, type, value, facet, location=None):
         """@param type: the value for the L{type} attribute.
         @param value: the value for the L{value} attribute.
         @param facet: the value for the L{facet} attribute.
-        @param location: the value for the L{location} attribute.  Default taken from C{value} if possible."""
+        @param location: the value for the L{location} attribute.  Default taken from C{value} if possible.
+        """
         import pyxb.utils.utility
 
         self.type = type
@@ -894,18 +1079,25 @@ class SimpleFacetValueError (SimpleTypeValueError):
         # Bypass immediate parent
         super(SimpleTypeValueError, self).__init__(type, value, facet)
 
-    def __str__ (self):
-        return six.u('Type %s %s constraint violated by value %s') % (self.type._Name(), self.facet._Name, self.value)
+    def __str__(self):
+        return six.u("Type %s %s constraint violated by value %s") % (
+            self.type._Name(),
+            self.facet._Name,
+            self.value,
+        )
 
-class SimplePluralValueError (SimpleTypeValueError):
+
+class SimplePluralValueError(SimpleTypeValueError):
     """Raised when context requires a plural value.
 
     Unlike L{SimpleListValueError}, in this case the plurality is
     external to C{type}, for example when an element has simple
     content and allows multiple occurrences."""
+
     pass
 
-class AttributeValidationError (ValidationError):
+
+class AttributeValidationError(ValidationError):
     """Raised when an attribute requirement is not satisfied."""
 
     type = None
@@ -917,13 +1109,14 @@ class AttributeValidationError (ValidationError):
     instance = None
     """The binding instance, if available."""
 
-    def __init__ (self, type, tag, instance=None, location=None):
+    def __init__(self, type, tag, instance=None, location=None):
         """@param type: the value for the L{type} attribute.
         @param tag: the value for the L{tag} attribute.
         @param instance: the value for the L{instance} attribute.
         @param location: the value for the L{location} attribute.  Default taken from C{instance} if possible.
         """
         import pyxb.utils.utility as utility
+
         self.type = type
         self.tag = tag
         self.instance = instance
@@ -932,74 +1125,99 @@ class AttributeValidationError (ValidationError):
         self.location = location
         super(AttributeValidationError, self).__init__(type, tag, instance, location)
 
+
 @six.python_2_unicode_compatible
-class UnrecognizedAttributeError (AttributeValidationError):
+class UnrecognizedAttributeError(AttributeValidationError):
     """Attempt to reference an attribute not sanctioned by content model."""
-    def __str__ (self):
-        return six.u('Attempt to reference unrecognized attribute %s in type %s') % (self.tag, self.type)
+
+    def __str__(self):
+        return six.u("Attempt to reference unrecognized attribute %s in type %s") % (
+            self.tag,
+            self.type,
+        )
+
 
 @six.python_2_unicode_compatible
-class ProhibitedAttributeError (AttributeValidationError):
+class ProhibitedAttributeError(AttributeValidationError):
     """Raised when an attribute that is prohibited is set or referenced in an element."""
-    def __str__ (self):
-        return six.u('Attempt to reference prohibited attribute %s in type %s') % (self.tag, self.type)
+
+    def __str__(self):
+        return six.u("Attempt to reference prohibited attribute %s in type %s") % (
+            self.tag,
+            self.type,
+        )
+
 
 @six.python_2_unicode_compatible
-class MissingAttributeError (AttributeValidationError):
+class MissingAttributeError(AttributeValidationError):
     """Raised when an attribute that is required is missing in an element."""
-    def __str__ (self):
-        return six.u('Instance of %s lacks required attribute %s') % (self.type, self.tag)
+
+    def __str__(self):
+        return six.u("Instance of %s lacks required attribute %s") % (
+            self.type,
+            self.tag,
+        )
+
 
 @six.python_2_unicode_compatible
-class AttributeChangeError (AttributeValidationError):
+class AttributeChangeError(AttributeValidationError):
     """Attempt to change an attribute that has a fixed value constraint."""
-    def __str__ (self):
-        return six.u('Cannot change fixed attribute %s in type %s') % (self.tag, self.type)
 
-class BindingError (PyXBException):
+    def __str__(self):
+        return six.u("Cannot change fixed attribute %s in type %s") % (
+            self.tag,
+            self.type,
+        )
+
+
+class BindingError(PyXBException):
     """Raised when the bindings are mis-used.
 
     These are not validation errors, but rather structural errors.
     For example, attempts to extract complex content from a type that
-    requires simple content, or vice versa.  """
+    requires simple content, or vice versa."""
+
 
 @six.python_2_unicode_compatible
-class NotSimpleContentError (BindingError):
+class NotSimpleContentError(BindingError):
     """An operation that requires simple content was invoked on a
     complex type instance that does not have simple content."""
 
     instance = None
     """The binding instance which should have had simple content."""
 
-    def __init__ (self, instance):
+    def __init__(self, instance):
         """@param instance: the binding instance that was mis-used.
         This will be available in the L{instance} attribute."""
         self.instance = instance
         super(BindingError, self).__init__(instance)
+
     pass
 
-    def __str__ (self):
-        return six.u('type %s does not have simple content') % (self.instance._Name(),)
+    def __str__(self):
+        return six.u("type %s does not have simple content") % (self.instance._Name(),)
+
 
 @six.python_2_unicode_compatible
-class NotComplexContentError (BindingError):
+class NotComplexContentError(BindingError):
     """An operation that requires a content model was invoked on a
     complex type instance that has empty or simple content."""
 
     instance = None
     """The binding instance which should have had a content model."""
 
-    def __init__ (self, instance):
+    def __init__(self, instance):
         """@param instance: the binding instance that was mis-used.
         This will be available in the L{instance} attribute."""
         self.instance = instance
         super(BindingError, self).__init__(instance)
 
-    def __str__ (self):
-        return six.u('type %s has simple/empty content') % (self.instance._Name(),)
+    def __str__(self):
+        return six.u("type %s has simple/empty content") % (self.instance._Name(),)
+
 
 @six.python_2_unicode_compatible
-class ReservedNameError (BindingError):
+class ReservedNameError(BindingError):
     """Reserved name set in binding instance."""
 
     instance = None
@@ -1008,27 +1226,35 @@ class ReservedNameError (BindingError):
     name = None
     """The name that was caught being assigned"""
 
-    def __init__ (self, instance, name):
+    def __init__(self, instance, name):
         """@param instance: the value for the L{instance} attribute.
         p@param name: the value for the L{name} attribute."""
         self.instance = instance
         self.name = name
         super(ReservedNameError, self).__init__(instance, name)
 
-    def __str__ (self):
-        return six.u('%s is a reserved name within %s') % (self.name, self.instance._Name())
+    def __str__(self):
+        return six.u("%s is a reserved name within %s") % (
+            self.name,
+            self.instance._Name(),
+        )
 
-class PyXBError (Exception):
+
+class PyXBError(Exception):
     """Base class for exceptions that indicate a problem that the user probably can't fix."""
+
     pass
 
-class UsageError (PyXBError):
+
+class UsageError(PyXBError):
     """Raised when the code detects user violation of an API."""
 
-class LogicError (PyXBError):
+
+class LogicError(PyXBError):
     """Raised when the code detects an implementation problem."""
 
-class IncompleteImplementationError (LogicError):
+
+class IncompleteImplementationError(LogicError):
     """Raised when required capability has not been implemented.
 
     This is only used where it is reasonable to expect the capability

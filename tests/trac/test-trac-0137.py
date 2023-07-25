@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -8,7 +9,8 @@ import pyxb.binding.datatypes as xs
 import xml.dom
 
 import os.path
-xsd='''<?xml version="1.0" encoding="UTF-8"?>
+
+xsd = """<?xml version="1.0" encoding="UTF-8"?>
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:simpleType name="stype">
@@ -26,48 +28,50 @@ xsd='''<?xml version="1.0" encoding="UTF-8"?>
   </xs:complexType>
   <xs:element name="wrapper" type="wrapper"/>
 </xs:schema>
-'''
+"""
 
-#open('schema.xsd', 'w').write(xsd)
+# open('schema.xsd', 'w').write(xsd)
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#open('code.py', 'w').write(code)
+# open('code.py', 'w').write(code)
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
 
 import unittest
 
-class TestTrac_0137 (unittest.TestCase):
-    def setUp (self):
+
+class TestTrac_0137(unittest.TestCase):
+    def setUp(self):
         # Hide the warning about failure to convert DOM node {}third
         # to a binding
-        self.__basis_log = logging.getLogger('pyxb.binding.basis')
+        self.__basis_log = logging.getLogger("pyxb.binding.basis")
         self.__basis_loglevel = self.__basis_log.level
         self.__basis_log.setLevel(logging.ERROR)
 
-    def tearDown (self):
+    def tearDown(self):
         pyxb.RequireValidWhenParsing(True)
         self.__basis_log.level = self.__basis_loglevel
 
-    def validate (self):
-        xmls = '<wrapper><first/><second/><third><selt>text</selt></third></wrapper>'
+    def validate(self):
+        xmls = "<wrapper><first/><second/><third><selt>text</selt></third></wrapper>"
         doc = pyxb.utils.domutils.StringToDOM(xmls)
         instance = wrapper.createFromDOM(doc.documentElement)
         self.assertEqual(1, len(instance.wildcardElements()))
         third = instance.wildcardElements()[0]
         self.assertTrue(isinstance(third, xml.dom.Node))
         self.assertEqual(xml.dom.Node.ELEMENT_NODE, third.nodeType)
-        self.assertEqual('third', third.localName)
+        self.assertEqual("third", third.localName)
 
-    def testWithValidation (self):
+    def testWithValidation(self):
         pyxb.RequireValidWhenParsing(True)
         self.validate()
 
-    def testWithoutValidation (self):
+    def testWithoutValidation(self):
         pyxb.RequireValidWhenParsing(False)
         self.validate()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

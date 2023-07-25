@@ -36,35 +36,66 @@ _GenerationUID = pyxb.namespace.builtin.BuiltInObjectUID
 
 # Import bindings for namespaces imported into schema
 
-Namespace = pyxb.namespace.NamespaceForURI('http://www.w3.org/XML/1998/namespace', create_if_missing=True)
+Namespace = pyxb.namespace.NamespaceForURI(
+    "http://www.w3.org/XML/1998/namespace", create_if_missing=True
+)
+
 
 # Atomic SimpleTypeDefinition
-class STD_ANON_space (pyxb.binding.datatypes.NCName, pyxb.binding.basis.enumeration_mixin):
+class STD_ANON_space(
+    pyxb.binding.datatypes.NCName, pyxb.binding.basis.enumeration_mixin
+):
     """No information"""
 
     _ExpandedName = None
-STD_ANON_space._CF_enumeration = pyxb.binding.facets.CF_enumeration(value_datatype=STD_ANON_space, enum_prefix=None)
-STD_ANON_space.default = STD_ANON_space._CF_enumeration.addEnumeration(unicode_value=six.u('default'))
-STD_ANON_space.preserve = STD_ANON_space._CF_enumeration.addEnumeration(unicode_value=six.u('preserve'))
+
+
+STD_ANON_space._CF_enumeration = pyxb.binding.facets.CF_enumeration(
+    value_datatype=STD_ANON_space, enum_prefix=None
+)
+STD_ANON_space.default = STD_ANON_space._CF_enumeration.addEnumeration(
+    unicode_value=six.u("default")
+)
+STD_ANON_space.preserve = STD_ANON_space._CF_enumeration.addEnumeration(
+    unicode_value=six.u("preserve")
+)
 STD_ANON_space._InitializeFacetMap(STD_ANON_space._CF_enumeration)
 
+
 # Atomic SimpleTypeDefinition
-class STD_ANON_emptyString (pyxb.binding.datatypes.string, pyxb.binding.basis.enumeration_mixin):
+class STD_ANON_emptyString(
+    pyxb.binding.datatypes.string, pyxb.binding.basis.enumeration_mixin
+):
     """No information"""
 
     _ExpandedName = None
-STD_ANON_emptyString._CF_enumeration = pyxb.binding.facets.CF_enumeration(value_datatype=STD_ANON_emptyString, enum_prefix=None)
-STD_ANON_emptyString.emptyString = STD_ANON_emptyString._CF_enumeration.addEnumeration(unicode_value=six.u(''))
+
+
+STD_ANON_emptyString._CF_enumeration = pyxb.binding.facets.CF_enumeration(
+    value_datatype=STD_ANON_emptyString, enum_prefix=None
+)
+STD_ANON_emptyString.emptyString = STD_ANON_emptyString._CF_enumeration.addEnumeration(
+    unicode_value=six.u("")
+)
 STD_ANON_emptyString._InitializeFacetMap(STD_ANON_emptyString._CF_enumeration)
+
 
 # Union SimpleTypeDefinition
 # superclasses pyxb.binding.datatypes.anySimpleType
-class STD_ANON_lang (pyxb.binding.basis.STD_union):
+class STD_ANON_lang(pyxb.binding.basis.STD_union):
     """Simple type that is a union of pyxb.binding.datatypes.language, STD_ANON_emptyString"""
 
     _ExpandedName = None
-    _MemberTypes = ( pyxb.binding.datatypes.language, STD_ANON_emptyString, )
-STD_ANON_lang._CF_enumeration = pyxb.binding.facets.CF_enumeration(value_datatype=STD_ANON_lang)
+    _MemberTypes = (
+        pyxb.binding.datatypes.language,
+        STD_ANON_emptyString,
+    )
+
+
+STD_ANON_lang._CF_enumeration = pyxb.binding.facets.CF_enumeration(
+    value_datatype=STD_ANON_lang
+)
 STD_ANON_lang._CF_pattern = pyxb.binding.facets.CF_pattern()
-STD_ANON_lang._InitializeFacetMap(STD_ANON_lang._CF_enumeration,
-   STD_ANON_lang._CF_pattern)
+STD_ANON_lang._InitializeFacetMap(
+    STD_ANON_lang._CF_enumeration, STD_ANON_lang._CF_pattern
+)

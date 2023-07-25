@@ -32,7 +32,8 @@ import re
 from pyxb.utils import six
 from pyxb.utils.six.moves import xrange
 
-def countCodepoints (codepoints):
+
+def countCodepoints(codepoints):
     count = 0
     for v in codepoints:
         if isinstance(v, tuple):
@@ -41,7 +42,8 @@ def countCodepoints (codepoints):
             count = count + 1
     return count
 
-def condenseCodepoints (codepoints):
+
+def condenseCodepoints(codepoints):
     ranges = []
     codepoints = list(codepoints)
     codepoints.sort()
@@ -58,7 +60,7 @@ def condenseCodepoints (codepoints):
                 range_next += 1
                 continue
         if range_min is not None:
-            ranges.append( (range_min, range_last) )
+            ranges.append((range_min, range_last))
         if isinstance(codepoint, tuple):
             range_min = None
             ranges.append(codepoint)
@@ -66,24 +68,26 @@ def condenseCodepoints (codepoints):
             range_last = range_min = codepoints[ri]
             range_next = range_last + 1
     if range_min is not None:
-        ranges.append( (range_min, range_last) )
+        ranges.append((range_min, range_last))
     return ranges
 
-def rangesToPython (ranges, indent=11, width=67):
-    ranges.sort()
-    text = ', '.join( [ '(0x%06x, 0x%06x)' % _r for _r in ranges ] )
-    text += ','
-    wrapped = textwrap.wrap(text, 67)
-    return ("\n%s" % (' ' * indent,)).join(wrapped)
 
-def emitCategoryMap (data_file):
+def rangesToPython(ranges, indent=11, width=67):
+    ranges.sort()
+    text = ", ".join(["(0x%06x, 0x%06x)" % _r for _r in ranges])
+    text += ","
+    wrapped = textwrap.wrap(text, 67)
+    return ("\n%s" % (" " * indent,)).join(wrapped)
+
+
+def emitCategoryMap(data_file):
     category_map = {}
     unicode_data = open(data_file)
     range_first = None
     last_codepoint = -1
     while True:
         line = unicode_data.readline()
-        fields = line.split(';')
+        fields = line.split(";")
         if 1 >= len(fields):
             break
         codepoint = int(fields[0], 16)
@@ -92,41 +96,47 @@ def emitCategoryMap (data_file):
 
         # If code points are are not listed in the file, they are in the Cn category.
         if range_first is None and last_codepoint + 1 != codepoint:
-            category_map.setdefault('Cn', []).append((last_codepoint + 1, codepoint))
-            category_map.setdefault('C', []).append((last_codepoint + 1, codepoint))
+            category_map.setdefault("Cn", []).append((last_codepoint + 1, codepoint))
+            category_map.setdefault("C", []).append((last_codepoint + 1, codepoint))
         last_codepoint = codepoint
 
-        if char_name.endswith(', First>'):
+        if char_name.endswith(", First>"):
             assert range_first is None
             range_first = codepoint
             continue
         if range_first is not None:
-            assert char_name.endswith(', Last>')
-            codepoint = ( range_first, codepoint )
+            assert char_name.endswith(", Last>")
+            codepoint = (range_first, codepoint)
             range_first = None
         category_map.setdefault(category, []).append(codepoint)
         category_map.setdefault(category[0], []).append(codepoint)
 
     # Code points at the end of the Unicode range that are are not listed in
     # the file are in the Cn category.
-    category_map.setdefault('Cn', []).append((last_codepoint + 1, 0x10FFFF))
-    category_map.setdefault('C', []).append((last_codepoint + 1, 0x10FFFF))
+    category_map.setdefault("Cn", []).append((last_codepoint + 1, 0x10FFFF))
+    category_map.setdefault("C", []).append((last_codepoint + 1, 0x10FFFF))
 
     for k, v in six.iteritems(category_map):
         category_map[k] = condenseCodepoints(v)
 
-    print('# Unicode general category properties: %d properties' % (len(category_map),))
-    print('PropertyMap = {')
-    for (k, v) in sorted(six.iteritems(category_map)):
-        print('  # %s: %d codepoint groups (%d codepoints)' % (k, len(v), countCodepoints(v)))
+    print("# Unicode general category properties: %d properties" % (len(category_map),))
+    print("PropertyMap = {")
+    for k, v in sorted(six.iteritems(category_map)):
+        print(
+            "  # %s: %d codepoint groups (%d codepoints)"
+            % (k, len(v), countCodepoints(v))
+        )
         print("  %-4s : CodePointSet([" % ("'%s'" % k,))
         print("           %s" % (rangesToPython(v, indent=11, width=67),))
         print("         ]),")
-    print('  }')
+    print("  }")
 
-def emitBlockMap (data_file):
-    block_map = { }
-    block_re = re.compile('(?P<min>[0-9A-F]+)(?P<spans>\.\.|; )(?P<max>[0-9A-F]+);\s(?P<block>.*)$')
+
+def emitBlockMap(data_file):
+    block_map = {}
+    block_re = re.compile(
+        "(?P<min>[0-9A-F]+)(?P<spans>\.\.|; )(?P<max>[0-9A-F]+);\s(?P<block>.*)$"
+    )
     block_data = open(data_file)
     while True:
         line = block_data.readline()
@@ -135,25 +145,28 @@ def emitBlockMap (data_file):
         mo = block_re.match(line)
         if mo is None:
             continue
-        rmin = int(mo.group('min'), 16)
-        rmax = int(mo.group('max'), 16)
-        block = mo.group('block').replace(' ', '')
-        block_map.setdefault(block, []).append( (rmin, rmax) )
+        rmin = int(mo.group("min"), 16)
+        rmax = int(mo.group("max"), 16)
+        block = mo.group("block").replace(" ", "")
+        block_map.setdefault(block, []).append((rmin, rmax))
 
-    print('# Unicode code blocks: %d blocks' % (len(block_map),))
-    print('BlockMap = {')
+    print("# Unicode code blocks: %d blocks" % (len(block_map),))
+    print("BlockMap = {")
     for k in sorted(six.iterkeys(block_map)):
         v = block_map.get(k)
-        print('  %s : CodePointSet(' % (repr(k),))
-        print('     %s' % (rangesToPython(v, indent=6, width=67),))
-        print('  ),')
-    print('  }')
+        print("  %s : CodePointSet(" % (repr(k),))
+        print("     %s" % (rangesToPython(v, indent=6, width=67),))
+        print("  ),")
+    print("  }")
 
-print('''# -*- coding: utf-8 -*-
+
+print(
+    """# -*- coding: utf-8 -*-
 # Unicode property and category maps.
 
 from pyxb.utils.unicode import CodePointSet
-''')
+"""
+)
 
-emitBlockMap('Blocks-4.txt')
-emitCategoryMap('UnicodeData-3.1.0.txt')
+emitBlockMap("Blocks-4.txt")
+emitCategoryMap("UnicodeData-3.1.0.txt")

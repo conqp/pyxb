@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -8,7 +9,8 @@ import pyxb.utils.domutils
 from xml.dom import Node
 
 import os.path
-xsd='''<?xml version="1.0" encoding="UTF-8"?>
+
+xsd = """<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:trac-0208">
   <xs:complexType name="BaseComplex">
     <xs:complexContent mixed="false">
@@ -27,22 +29,23 @@ xsd='''<?xml version="1.0" encoding="UTF-8"?>
     <xs:restriction xmlns:tns="urn:trac-0208" base="tns:BaseSimple"/>
   </xs:simpleType>
 </xs:schema>
-'''
+"""
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#print code
+# print code
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
 
 import unittest
 
-class TestTrac0208 (unittest.TestCase):
 
-    def testBasic (self):
+class TestTrac0208(unittest.TestCase):
+    def testBasic(self):
         pass
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

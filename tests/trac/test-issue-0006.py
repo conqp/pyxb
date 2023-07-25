@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 # Undeclared XML namespace
@@ -14,9 +15,9 @@ import os.path
 
 import unittest
 
-class TestIssue0006 (unittest.TestCase):
 
-    local_xsd = '''<?xml version="1.0" encoding="UTF-8"?>
+class TestIssue0006(unittest.TestCase):
+    local_xsd = """<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="ce">
     <xs:complexType name="cet">
@@ -26,9 +27,9 @@ class TestIssue0006 (unittest.TestCase):
     </xs:complexType>
   </xs:element>
 </xs:schema>
-'''
+"""
 
-    top_xsd = '''<?xml version="1.0" encoding="UTF-8"?>
+    top_xsd = """<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:complexType name="cet">
     <xs:sequence>
@@ -36,25 +37,26 @@ class TestIssue0006 (unittest.TestCase):
     </xs:sequence>
   </xs:complexType>
 </xs:schema>
-'''
+"""
 
-    def testNamedLocal (self):
+    def testNamedLocal(self):
         with self.assertRaises(pyxb.SchemaValidationError) as cm:
             code = pyxb.binding.generate.GeneratePython(schema_text=self.local_xsd)
         e = cm.exception
 
-    def testUnnamedLocal (self):
-        fixed = self.local_xsd.replace('name="cet"', '')
+    def testUnnamedLocal(self):
+        fixed = self.local_xsd.replace('name="cet"', "")
         code = pyxb.binding.generate.GeneratePython(schema_text=fixed)
 
-    def testNamedTop (self):
+    def testNamedTop(self):
         code = pyxb.binding.generate.GeneratePython(schema_text=self.top_xsd)
 
-    def testUnnamedTop (self):
-        broken = self.top_xsd.replace('name="cet"', '')
+    def testUnnamedTop(self):
+        broken = self.top_xsd.replace('name="cet"', "")
         with self.assertRaises(pyxb.SchemaValidationError) as cm:
             code = pyxb.binding.generate.GeneratePython(schema_text=broken)
         e = cm.exception
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

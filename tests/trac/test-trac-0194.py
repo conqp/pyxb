@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -10,7 +11,8 @@ import pyxb.utils.domutils
 import gc
 
 import os.path
-xsd='''<?xml version="1.0" encoding="UTF-8"?>
+
+xsd = """<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:complexType name="color"/>
     <xs:complexType name="ecolor">
@@ -29,21 +31,23 @@ xsd='''<?xml version="1.0" encoding="UTF-8"?>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-</xs:schema>'''
+</xs:schema>"""
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#open('code.py', 'w').write(code)
+# open('code.py', 'w').write(code)
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
 
 import unittest
 
-class TestTrac0194 (unittest.TestCase):
-    def testAll (self):
+
+class TestTrac0194(unittest.TestCase):
+    def testAll(self):
         pass
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

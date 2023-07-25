@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -10,7 +11,8 @@ from xml.dom import Node
 import pyxb.namespace
 
 import os.path
-xst = '''<?xml version="1.0"?>
+
+xst = """<?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="var_test">
     <xs:complexType>
@@ -32,30 +34,32 @@ xst = '''<?xml version="1.0"?>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>
-'''
+"""
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xst)
-#open('code.py', 'w').write(code)
+# open('code.py', 'w').write(code)
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
 
 import unittest
 
-class TestIssue15 (unittest.TestCase):
-    def testSimple (self):
+
+class TestIssue15(unittest.TestCase):
+    def testSimple(self):
         vt = var_test()
         vt.data = tSimple("s")
         instance = CreateFromDOM(vt.toDOM())
         self.assertIsInstance(instance.data, tSimple)
 
-    def testComplex (self):
+    def testComplex(self):
         vt = var_test()
         vt.data = tComplex("c")
         instance = CreateFromDOM(vt.toDOM())
         self.assertIsInstance(instance.data, tComplex)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

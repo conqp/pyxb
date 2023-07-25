@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -9,7 +10,8 @@ import pyxb.utils.domutils
 from xml.dom import Node
 
 import os.path
-xsd='''<?xml version="1.0" encoding="UTF-8"?>
+
+xsd = """<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:complexType name="Present">
     <xs:sequence>
@@ -35,12 +37,12 @@ xsd='''<?xml version="1.0" encoding="UTF-8"?>
       </xs:choice>
     </xs:complexType>
   </xs:element>
-</xs:schema>'''
+</xs:schema>"""
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#open('code.py', 'w').write(code)
+# open('code.py', 'w').write(code)
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
@@ -48,31 +50,33 @@ from pyxb.exceptions_ import *
 import unittest
 import sys
 
-class TestIssue0079 (unittest.TestCase):
-    def testPresent (self):
-        xmlt = '<sel><present><pContent/></present></sel>';
-        xmld = xmlt.encode('utf-8');
-        doc = CreateFromDocument(xmlt);
-        self.assertEqual(xmld, doc.toxml('utf-8', root_only=True))
 
-    def testOptional (self):
-        xmlt = '<sel><optional><oContent/></optional></sel>';
-        xmld = xmlt.encode('utf-8');
-        doc = CreateFromDocument(xmlt);
-        self.assertEqual(xmld, doc.toxml('utf-8', root_only=True))
-        xmlt = '<sel><optional/></sel>';
-        xmld = xmlt.encode('utf-8');
-        doc = CreateFromDocument(xmlt);
-        self.assertEqual(xmld, doc.toxml('utf-8', root_only=True))
+class TestIssue0079(unittest.TestCase):
+    def testPresent(self):
+        xmlt = "<sel><present><pContent/></present></sel>"
+        xmld = xmlt.encode("utf-8")
+        doc = CreateFromDocument(xmlt)
+        self.assertEqual(xmld, doc.toxml("utf-8", root_only=True))
 
-    def testAbsent (self):
-        xmlt = '<sel><absent/></sel>';
-        xmld = xmlt.encode('utf-8');
-        doc = CreateFromDocument(xmlt);
-        self.assertEqual(xmld, doc.toxml('utf-8', root_only=True))
-        xmlt = '<sel><absent><aContent/></absent></sel>';
+    def testOptional(self):
+        xmlt = "<sel><optional><oContent/></optional></sel>"
+        xmld = xmlt.encode("utf-8")
+        doc = CreateFromDocument(xmlt)
+        self.assertEqual(xmld, doc.toxml("utf-8", root_only=True))
+        xmlt = "<sel><optional/></sel>"
+        xmld = xmlt.encode("utf-8")
+        doc = CreateFromDocument(xmlt)
+        self.assertEqual(xmld, doc.toxml("utf-8", root_only=True))
+
+    def testAbsent(self):
+        xmlt = "<sel><absent/></sel>"
+        xmld = xmlt.encode("utf-8")
+        doc = CreateFromDocument(xmlt)
+        self.assertEqual(xmld, doc.toxml("utf-8", root_only=True))
+        xmlt = "<sel><absent><aContent/></absent></sel>"
         with self.assertRaises(pyxb.UnrecognizedContentError) as cm:
-            doc = CreateFromDocument(xmlt);
+            doc = CreateFromDocument(xmlt)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 # See also:
@@ -17,7 +18,8 @@ import xml.sax
 import io
 
 import os.path
-xsd='''<?xml version="1.0" encoding="UTF-8"?>
+
+xsd = """<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
     <xs:element name="foo" type="xs:string"/>
     <xs:element name="bar">
@@ -28,37 +30,38 @@ xsd='''<?xml version="1.0" encoding="UTF-8"?>
             <xs:attribute name="a" type="xs:string"/>
         </xs:complexType>
     </xs:element>
-</xs:schema>'''
+</xs:schema>"""
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#open('code.py', 'w').write(code)
+# open('code.py', 'w').write(code)
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
 
 import unittest
 
-class TestTrac0131 (unittest.TestCase):
+
+class TestTrac0131(unittest.TestCase):
     # Unicode string, UTF-8 encoding (per declaration at script top)
-    strt = 'Sign of Leser-Trélat'
-    strd = strt.encode('utf-8')
-    base_xmlt = '<bar><e>' + strt + '</e></bar>'
+    strt = "Sign of Leser-Trélat"
+    strd = strt.encode("utf-8")
+    base_xmlt = "<bar><e>" + strt + "</e></bar>"
     declared_xmlt = '<?xml version="1.0" encoding="UTF-8"?>' + base_xmlt
 
-    def setUp (self):
+    def setUp(self):
         self.__xmlStyle = pyxb._XMLStyle
 
-    def tearDown (self):
+    def tearDown(self):
         pyxb._SetXMLStyle(self.__xmlStyle)
 
-    def testRepresentation (self):
-        self.assertEqual(self.strd, b'Sign of Leser-Tr\xc3\xa9lat')
+    def testRepresentation(self):
+        self.assertEqual(self.strd, b"Sign of Leser-Tr\xc3\xa9lat")
 
-    def testBasicParse (self):
+    def testBasicParse(self):
         xmlt = self.base_xmlt
-        xmld = xmlt.encode('utf-8')
+        xmld = xmlt.encode("utf-8")
         self.assertTrue(isinstance(xmlt, six.text_type))
         self.assertTrue(isinstance(xmld, six.binary_type))
         pyxb._SetXMLStyle(pyxb.XMLStyle_saxer)
@@ -78,9 +81,9 @@ class TestTrac0131 (unittest.TestCase):
         instance = CreateFromDocument(xmld)
         self.assertEqual(instance.e, self.strt)
 
-    def testDeclaredParse (self):
+    def testDeclaredParse(self):
         xmlt = self.declared_xmlt
-        xmld = xmlt.encode('utf-8')
+        xmld = xmlt.encode("utf-8")
         self.assertTrue(isinstance(xmlt, six.text_type))
         self.assertTrue(isinstance(xmld, six.binary_type))
         pyxb._SetXMLStyle(pyxb.XMLStyle_saxer)
@@ -100,19 +103,20 @@ class TestTrac0131 (unittest.TestCase):
         instance = CreateFromDocument(xmld)
         self.assertEqual(instance.e, self.strt)
 
-    def testElementEncode (self):
+    def testElementEncode(self):
         instance = bar()
         instance.e = self.strt
         self.assertEqual(instance.e, self.strt)
 
-    def testAttributeEncode (self):
+    def testAttributeEncode(self):
         instance = bar()
         instance.a = self.strt
         self.assertEqual(instance.a, self.strt)
 
-    def testuEncode (self):
+    def testuEncode(self):
         instance = foo(self.strt)
         self.assertEqual(instance, self.strt)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

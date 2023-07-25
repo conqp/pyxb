@@ -19,51 +19,54 @@ from docutils import nodes
 import sys
 import re
 
-__Reference_re = re.compile('\s*(.*)\s+<(.*)>\s*$', re.MULTILINE + re.DOTALL)
+__Reference_re = re.compile("\s*(.*)\s+<(.*)>\s*$", re.MULTILINE + re.DOTALL)
+
 
 def ticket_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
     """
     Role `:ticket:` generates references to SourceForge tickets.
     """
-    trac_root = 'https://sourceforge.net/p/pyxb/tickets'
+    trac_root = "https://sourceforge.net/p/pyxb/tickets"
 
     # assume module is references
 
-    #print 'Text "%s"' % (text,)
+    # print 'Text "%s"' % (text,)
     mo = __Reference_re.match(text)
     label = None
     if mo is not None:
-        ( label, text ) = mo.group(1, 2)
+        (label, text) = mo.group(1, 2)
     ticket = text.strip()
 
-    uri = '%s/%s/' % (trac_root, ticket)
+    uri = "%s/%s/" % (trac_root, ticket)
     if label is None:
-        label = 'SF ticket %s' % (ticket,)
+        label = "SF ticket %s" % (ticket,)
     node = nodes.reference(rawtext, label, refuri=uri, **options)
 
     return [node], []
+
 
 def issue_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
     """
     Role `:issue:` generates references to github issues.
     """
-    issue_root = 'https://github.com/pabigot/pyxb/issues'
+    issue_root = "https://github.com/pabigot/pyxb/issues"
 
     # assume module is references
 
     mo = __Reference_re.match(text)
     label = None
     if mo is not None:
-        ( label, text ) = mo.group(1, 2)
+        (label, text) = mo.group(1, 2)
     ticket = text.strip()
 
-    uri = '%s/%s/' % (issue_root, ticket)
+    uri = "%s/%s/" % (issue_root, ticket)
     if label is None:
-        label = 'issue %s' % (ticket,)
+        label = "issue %s" % (ticket,)
     node = nodes.reference(rawtext, label, refuri=uri, **options)
 
     return [node], []
 
+
 def setup(app):
-    app.add_role('ticket', ticket_role)
-    app.add_role('issue', issue_role)
+    app.add_role("ticket", ticket_role)
+    app.add_role("issue", issue_role)

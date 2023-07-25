@@ -7,19 +7,24 @@ from pyxb.utils import domutils
 import pyxb.bundles.wssplat.soap11 as soapenv
 import pyxb.bundles.wssplat.soapenc as soapenc
 
-address = '1600 Pennsylvania Ave., Washington, DC'
+address = "1600 Pennsylvania Ave., Washington, DC"
 if 1 < len(sys.argv):
     address = sys.argv[1]
 
 env = soapenv.Envelope(Body=BIND(GeoCoder.geocode(address)))
 
-uri = urllib_request.Request('http://rpc.geocoder.us/service/soap/',
-                      env.toxml("utf-8"),
-                      { 'SOAPAction' : "http://rpc.geocoder.us/Geo/Coder/US#geocode", 'Content-Type': 'text/xml' } )
+uri = urllib_request.Request(
+    "http://rpc.geocoder.us/service/soap/",
+    env.toxml("utf-8"),
+    {
+        "SOAPAction": "http://rpc.geocoder.us/Geo/Coder/US#geocode",
+        "Content-Type": "text/xml",
+    },
+)
 
 rxml = urllib_request.urlopen(uri).read()
-#open('response.xml', 'w').write(rxml)
-#rxml = open('response.xml').read()
+# open('response.xml', 'w').write(rxml)
+# rxml = open('response.xml').read()
 response = soapenv.CreateFromDocument(rxml)
 
 # OK, here we get into ugliness due to WSDL's concept of schema in the
@@ -40,7 +45,9 @@ response = soapenv.CreateFromDocument(rxml)
 # listed and it's not in the namespace admitted by the attribute
 # wildcard.  Fortunately, PyXB doesn't currently validate wildcards.
 
-encoding_style = response.wildcardAttributeMap().get(soapenv.Namespace.createExpandedName('encodingStyle'))
+encoding_style = response.wildcardAttributeMap().get(
+    soapenv.Namespace.createExpandedName("encodingStyle")
+)
 items = []
 if encoding_style == soapenc.Namespace.uri():
     gcr = response.Body.wildcardElements()[0]
@@ -51,10 +58,22 @@ else:
 
 for item in items:
     if (item.lat is None) or item.lat._isNil():
-        print('Warning: Address did not resolve')
-    print('''
+        print("Warning: Address did not resolve")
+    print(
+        """
 %s %s %s %s %s
 %s, %s  %s
-%s %s''' % (item.number, item.prefix, item.street, item.type, item.suffix,
-            item.city, item.state, item.zip,
-            item.lat, item.long))
+%s %s"""
+        % (
+            item.number,
+            item.prefix,
+            item.street,
+            item.type,
+            item.suffix,
+            item.city,
+            item.state,
+            item.zip,
+            item.lat,
+            item.long,
+        )
+    )

@@ -5,20 +5,26 @@ import pyxb.utils.domutils
 
 pyxb.utils.domutils.BindingDOMSupport.SetDefaultNamespace(xhtml.Namespace)
 
-head = xhtml.head(title='A Test Document')
+head = xhtml.head(title="A Test Document")
 body = xhtml.body()
-body.append(xhtml.h1('Contents'))
-body.append(xhtml.p('''Here is some text.
+body.append(xhtml.h1("Contents"))
+body.append(
+    xhtml.p(
+        """Here is some text.
 
-It doesn't do anything special.'''))
+It doesn't do anything special."""
+    )
+)
 
-p2 = xhtml.p('Here is more text.  It has ',
-             xhtml.b('bold'),
-             ' and ',
-             xhtml.em('emphasized'),
-             ' content with ',
-             xhtml.b('more bold'),
-             ' just to complicate things.')
+p2 = xhtml.p(
+    "Here is more text.  It has ",
+    xhtml.b("bold"),
+    " and ",
+    xhtml.em("emphasized"),
+    " content with ",
+    xhtml.b("more bold"),
+    " just to complicate things.",
+)
 body.append(p2)
 
 # Verify we have two b's and an em
@@ -32,4 +38,4 @@ try:
 except pyxb.ValidationError as e:
     print(e.details())
     raise
-open('genout.xhtml', 'w').write(xmls)
+open("genout.xhtml", "w").write(xmls)

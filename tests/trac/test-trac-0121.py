@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.datatypes as xsd
@@ -9,27 +10,28 @@ import copy
 
 import unittest
 
-class TestTrac0121 (unittest.TestCase):
-    def testPythonDT (self):
+
+class TestTrac0121(unittest.TestCase):
+    def testPythonDT(self):
         v = datetime.datetime.now()
         c = copy.copy(v)
         self.assertEqual(c, v)
 
-    def testDateTime (self):
+    def testDateTime(self):
         v = xsd.dateTime.now()
         c = copy.copy(v)
         self.assertEqual(c, v)
 
-    def testDate (self):
+    def testDate(self):
         v = xsd.date(datetime.date.today())
         c = copy.copy(v)
         self.assertEqual(c, v)
 
-    def testTime (self):
+    def testTime(self):
         v = xsd.time()
         c = copy.copy(v)
         self.assertEqual(c, v)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

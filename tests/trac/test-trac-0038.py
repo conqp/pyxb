@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -9,7 +10,8 @@ from xml.dom import Node
 import pyxb.binding.datatypes as xs
 
 import os.path
-xsd='''<?xml version="1.0" encoding="UTF-8"?>
+
+xsd = """<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:simpleType name="digits">
     <xs:restriction base="xs:byte">
@@ -57,37 +59,41 @@ xsd='''<?xml version="1.0" encoding="UTF-8"?>
     <xs:union memberTypes="bad tUnion"/>
   </xs:simpleType>
 
-</xs:schema>'''
+</xs:schema>"""
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#open('code.py', 'w').write(code)
+# open('code.py', 'w').write(code)
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
 
 import unittest
 
-def SET_lu (instance, v):
+
+def SET_lu(instance, v):
     instance.lu = v
 
-class TestTrac0038 (unittest.TestCase):
+
+class TestTrac0038(unittest.TestCase):
     """Visibility of enumerations within unions"""
-    def testBasic (self):
-        d = union('1')
+
+    def testBasic(self):
+        d = union("1")
         self.assertTrue(isinstance(d, digits))
-        e = union('one')
+        e = union("one")
         self.assertTrue(isinstance(e, english))
         self.assertEqual(e, english.one)
         self.assertEqual(e, tUnion.one)
-        w = union('dau')
+        w = union("dau")
         self.assertTrue(isinstance(w, welsh))
         self.assertEqual(w, welsh.dau)
         self.assertEqual(w, tUnion.dau)
-        self.assertRaises(pyxb.SimpleTypeValueError, union, 'deux')
-        n = union('ni')
+        self.assertRaises(pyxb.SimpleTypeValueError, union, "deux")
+        n = union("ni")
         self.assertEqual(n, tUnion.ni)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

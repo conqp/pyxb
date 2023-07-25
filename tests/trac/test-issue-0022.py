@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -11,7 +12,8 @@ import pyxb.namespace
 import xml.dom.minidom as minidom
 
 import os.path
-xst = '''<?xml version="1.0" encoding="utf-8"?>
+
+xst = """<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:simpleType name="bigpos">
     <xs:restriction base="xs:integer">
@@ -31,13 +33,13 @@ xst = '''<?xml version="1.0" encoding="utf-8"?>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>
-'''
+"""
 
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xst)
-#open('code.py', 'w').write(code)
+# open('code.py', 'w').write(code)
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
@@ -46,18 +48,19 @@ import unittest
 
 import copy
 
-class TestIssue22 (unittest.TestCase):
 
-    SMALL = (six.long_type(1) << 63)
+class TestIssue22(unittest.TestCase):
+    SMALL = six.long_type(1) << 63
     LARGE = (six.long_type(1) << 63) + 2
 
-    def testBigPos (self):
+    def testBigPos(self):
         self.assertEqual(self.SMALL, bigpos._CF_minInclusive.value())
         self.assertEqual(self.LARGE, bigpos._CF_maxInclusive.value())
 
-    def testBigNeg (self):
+    def testBigNeg(self):
         self.assertEqual(-self.SMALL, bigneg._CF_maxInclusive.value())
         self.assertEqual(-self.LARGE, bigneg._CF_minInclusive.value())
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

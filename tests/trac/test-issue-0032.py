@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -9,7 +10,8 @@ import pyxb.binding.basis
 import pyxb.utils.domutils
 
 import os.path
-xsd='''
+
+xsd = """
 <schema
     xmlns="http://www.w3.org/2001/XMLSchema"
     targetNamespace="urn:issue0032"
@@ -41,35 +43,37 @@ xsd='''
     </complexType>
 
 </schema>
-'''
+"""
 
-#open('schema.xsd', 'w').write(xsd)
+# open('schema.xsd', 'w').write(xsd)
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#open('code.py', 'w').write(code)
-#print code
+# open('code.py', 'w').write(code)
+# print code
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
 
 import unittest
 
-class TestIssue0032 (unittest.TestCase):
-    xmlt = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+class TestIssue0032(unittest.TestCase):
+    xmlt = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <customer xmlns="urn:issue0032">
     <address xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="canadianAddress">
         <street>1 A Street</street>
         <postalCode>Ontario</postalCode>
     </address>
-</customer>'''
+</customer>"""
 
-    def testRoundTrip (self):
+    def testRoundTrip(self):
         i = CreateFromDocument(self.xmlt)
         self.assertTrue(isinstance(i.address, canadianAddress))
-        xmlt = i.toxml('utf-8')
+        xmlt = i.toxml("utf-8")
         i2 = CreateFromDocument(xmlt)
         self.assertTrue(isinstance(i2.address, canadianAddress))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

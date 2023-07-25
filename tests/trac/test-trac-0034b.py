@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -8,7 +9,8 @@ import pyxb.utils.domutils
 from xml.dom import Node
 
 import os.path
-xsd='''<?xml version="1.0" encoding="UTF-8"?>
+
+xsd = """<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="a"/>
   <xs:element name="b"/>
@@ -64,20 +66,21 @@ xsd='''<?xml version="1.0" encoding="UTF-8"?>
       <xs:group ref="CbcdPCbe"/>
     </xs:sequence>
   </xs:complexType>
-</xs:schema>'''
+</xs:schema>"""
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#print code
+# print code
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
 
 import unittest
 
-class TestTrac0034 (unittest.TestCase):
-    def test_aBCde (self):
+
+class TestTrac0034(unittest.TestCase):
+    def test_aBCde(self):
         instance = aBCde()
         self.assertEqual(None, instance.a)
         self.assertEqual([], instance.b)
@@ -85,14 +88,14 @@ class TestTrac0034 (unittest.TestCase):
         self.assertEqual(None, instance.d)
         self.assertEqual(None, instance.e)
 
-    def test_Bcde (self):
+    def test_Bcde(self):
         instance = Bcde()
         self.assertEqual([], instance.b)
         self.assertEqual(None, instance.c)
         self.assertEqual(None, instance.d)
         self.assertEqual(None, instance.e)
 
-    def test_aBCDE (self):
+    def test_aBCDE(self):
         instance = aBCDE()
         self.assertEqual(None, instance.a)
         self.assertEqual([], instance.b)
@@ -100,5 +103,6 @@ class TestTrac0034 (unittest.TestCase):
         self.assertEqual([], instance.d)
         self.assertEqual([], instance.e)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -9,7 +10,8 @@ from pyxb.utils import six
 from xml.dom import Node
 
 import os.path
-xsd='''<?xml version="1.0" encoding="UTF-8"?>
+
+xsd = """<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="elt" type="xs:string"/>
   <xs:complexType name="empty"/>
@@ -23,32 +25,34 @@ xsd='''<?xml version="1.0" encoding="UTF-8"?>
       <xs:element ref="elt"/>
     </xs:sequence>
   </xs:complexType>
-</xs:schema>'''
+</xs:schema>"""
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#print code
+# print code
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
 
 import unittest
 
-class TestTrac0021 (unittest.TestCase):
+
+class TestTrac0021(unittest.TestCase):
     """Presence of a wildcard in a sequence model group causes other
     elements in that group to not be generated."""
-    def testEmpty (self):
+
+    def testEmpty(self):
         instance = empty()
         self.assertRaises(pyxb.NotSimpleContentError, instance.value)
         self.assertRaises(pyxb.NotComplexContentError, instance.orderedContent)
 
-    def testSimple (self):
+    def testSimple(self):
         instance = simple("hi")
         self.assertEqual("hi", instance.value())
         self.assertRaises(pyxb.NotComplexContentError, instance.orderedContent)
 
-    def testComplex (self):
+    def testComplex(self):
         instance = complex("hi")
         self.assertRaises(pyxb.NotSimpleContentError, instance.value)
         elt = instance.orderedContent()[0]
@@ -56,5 +60,5 @@ class TestTrac0021 (unittest.TestCase):
         self.assertEqual("hi", elt.value)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

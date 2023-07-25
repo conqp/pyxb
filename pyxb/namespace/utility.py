@@ -22,7 +22,8 @@ from pyxb.utils import six
 
 _log = logging.getLogger(__name__)
 
-def NamespaceInstance (namespace):
+
+def NamespaceInstance(namespace):
     """Get a namespace instance for the given namespace.
 
     This is used when it is unclear whether the namespace is specified by URI
@@ -32,9 +33,12 @@ def NamespaceInstance (namespace):
         return namespace
     if isinstance(namespace, six.string_types):
         return NamespaceForURI(namespace, True)
-    raise pyxb.LogicError('Cannot identify namespace from value of type %s' % (type(namespace),))
+    raise pyxb.LogicError(
+        "Cannot identify namespace from value of type %s" % (type(namespace),)
+    )
 
-def NamespaceForURI (uri, create_if_missing=False):
+
+def NamespaceForURI(uri, create_if_missing=False):
     """Given a URI, provide the L{Namespace} instance corresponding to it.
 
     This can only be used to lookup or create real namespaces.  To create
@@ -50,15 +54,16 @@ def NamespaceForURI (uri, create_if_missing=False):
     @raise pyxb.LogicError: The uri is not a non-empty string
     """
     if not isinstance(uri, six.string_types):
-        raise pyxb.LogicError('Cannot lookup absent namespaces')
+        raise pyxb.LogicError("Cannot lookup absent namespaces")
     if 0 == len(uri):
-        raise pyxb.LogicError('Namespace URIs must not be empty strings')
+        raise pyxb.LogicError("Namespace URIs must not be empty strings")
     rv = pyxb.namespace.Namespace._NamespaceForURI(uri)
     if (rv is None) and create_if_missing:
         rv = pyxb.namespace.Namespace(uri)
     return rv
 
-def CreateAbsentNamespace ():
+
+def CreateAbsentNamespace():
     """Create an absent namespace.
 
     Use this when you need a namespace for declarations in a schema with no
@@ -67,6 +72,7 @@ def CreateAbsentNamespace ():
     because you won't be able to look it up."""
     return pyxb.namespace.Namespace.CreateAbsentNamespace()
 
-def AvailableNamespaces ():
+
+def AvailableNamespaces():
     """Return the complete set of Namespace instances known to the system."""
     return pyxb.namespace.Namespace.AvailableNamespaces()

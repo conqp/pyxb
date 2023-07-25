@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb.binding.generate
@@ -8,7 +9,8 @@ import pyxb.utils.domutils
 from xml.dom import Node
 
 import os.path
-xsd='''<?xml version="1.0" encoding="UTF-8"?>
+
+xsd = """<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:complexType name="YesNoChoice">
         <xs:annotation>
@@ -20,12 +22,12 @@ xsd='''<?xml version="1.0" encoding="UTF-8"?>
         </xs:choice>
     </xs:complexType>
   <xs:element name="yesNoChoice" type="YesNoChoice"/>
-</xs:schema>'''
+</xs:schema>"""
 
 code = pyxb.binding.generate.GeneratePython(schema_text=xsd)
-#open('code.py', 'w').write(code)
+# open('code.py', 'w').write(code)
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 from pyxb.exceptions_ import *
@@ -33,14 +35,17 @@ from pyxb.exceptions_ import *
 import unittest
 import sys
 
-class TestTrac0204 (unittest.TestCase):
+
+class TestTrac0204(unittest.TestCase):
     if sys.version_info[:2] < (2, 7):
-        def assertIsNone (self, v):
+
+        def assertIsNone(self, v):
             self.assertEqual(None, v)
-        def assertIsNotNone (self, v):
+
+        def assertIsNotNone(self, v):
             self.assertNotEqual(None, v)
 
-    def testCtor (self):
+    def testCtor(self):
         instance = yesNoChoice()
         self.assertIsNone(instance.Yes)
         self.assertIsNone(instance.No)
@@ -50,5 +55,6 @@ class TestTrac0204 (unittest.TestCase):
         instance = yesNoChoice(Yes=True, No=True)
         self.assertRaises(pyxb.UnprocessedElementContentError, instance.validateBinding)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

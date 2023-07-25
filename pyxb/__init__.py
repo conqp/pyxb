@@ -30,7 +30,8 @@ from pyxb.utils import six
 
 _log = logging.getLogger(__name__)
 
-class cscRoot (object):
+
+class cscRoot(object):
     """This little bundle of joy exists because in Python 2.6 it
     became an error to invoke C{object.__init__} with parameters (unless
     you also override C{__new__}, in which case it's only a warning.
@@ -48,7 +49,7 @@ class cscRoot (object):
 
     """
 
-    def __init__ (self, *args, **kw):
+    def __init__(self, *args, **kw):
         # Oh gross.  If this class descends from list (and probably dict), we
         # get here when object is *not* our direct superclass.  In that case,
         # we have to pass the arguments on up, or the strings don't get
@@ -58,16 +59,17 @@ class cscRoot (object):
         # Note that we might also get here if you mix-in a class that used
         # object as a parent instead of cscRoot.  Don't do that.  Printing the
         # mro() is a decent way of identifying the problem.
-        if issubclass(self.__class__.mro()[-2], ( list, dict )):
+        if issubclass(self.__class__.mro()[-2], (list, dict)):
             super(cscRoot, self).__init__(*args)
 
-__version__ = '1.2.7-DEV'
+
+__version__ = "1.2.7-DEV"
 """The version of PyXB"""
 
-__url__ = 'http://pyxb.sourceforge.net'
+__url__ = "http://pyxb.sourceforge.net"
 """The URL for PyXB's homepage"""
 
-__license__ = 'Apache License 2.0'
+__license__ = "Apache License 2.0"
 
 # Bring in the exception hierarchy
 from pyxb.exceptions_ import *
@@ -75,7 +77,8 @@ from pyxb.exceptions_ import *
 # Bring in namespace stuff
 import pyxb.namespace
 
-class BIND (object):
+
+class BIND(object):
     """Bundle data for automated binding generation.
 
     Instances of this class capture positional and keyword arguments that are
@@ -87,16 +90,17 @@ class BIND (object):
       w.option = BIND(54, units="m")
 
     """
+
     __args = None
     __kw = None
 
-    def __init__ (self, *args, **kw):
+    def __init__(self, *args, **kw):
         """Cache parameters for subsequent binding creation.
         Invoke just as you would the factory for a binding class."""
         self.__args = args
         self.__kw = kw
 
-    def createInstance (self, factory, **kw):
+    def createInstance(self, factory, **kw):
         """Invoke the given factory method.
 
         Position arguments to the factory are those cached in this instance.
@@ -125,14 +129,17 @@ if this style is selected."""
 _XMLStyle = XMLStyle_saxer
 """The current XML processing style."""
 
-_XMLStyleMap = { 'minidom' : XMLStyle_minidom,
-                 'saxdom' : XMLStyle_saxdom,
-                 'saxer' : XMLStyle_saxer }
-_XMLStyleMapReverse = dict([ (_v, _k) for (_k, _v) in six.iteritems(_XMLStyleMap) ])
+_XMLStyleMap = {
+    "minidom": XMLStyle_minidom,
+    "saxdom": XMLStyle_saxdom,
+    "saxer": XMLStyle_saxer,
+}
+_XMLStyleMapReverse = dict([(_v, _k) for (_k, _v) in six.iteritems(_XMLStyleMap)])
 
-_XMLStyle_envvar = 'PYXB_XML_STYLE'
+_XMLStyle_envvar = "PYXB_XML_STYLE"
 
-def _SetXMLStyle (style=None):
+
+def _SetXMLStyle(style=None):
     """Set the interface used to parse XML content.
 
     This can be invoked within code.  The system default of L{XMLStyle_saxer}
@@ -145,15 +152,19 @@ def _SetXMLStyle (style=None):
     global _XMLStyle
     if style is None:
         import os
+
         style_name = os.environ.get(_XMLStyle_envvar)
         if style_name is None:
-            style_name = 'saxer'
+            style_name = "saxer"
         style = _XMLStyleMap.get(style_name)
         if style is None:
-            raise PyXBException('Bad value "%s" for %s' % (style_name, _XMLStyle_envvar))
+            raise PyXBException(
+                'Bad value "%s" for %s' % (style_name, _XMLStyle_envvar)
+            )
     if _XMLStyleMapReverse.get(style) is None:
-        raise PyXBException('Bad value %s for _SetXMLStyle' % (style,))
+        raise PyXBException("Bad value %s for _SetXMLStyle" % (style,))
     _XMLStyle = style
+
 
 _SetXMLStyle()
 
@@ -174,7 +185,8 @@ PyXB methods.
 Applies only at compilation time; dynamic changes are ignored.
 """
 
-class ValidationConfig (object):
+
+class ValidationConfig(object):
     """Class holding configuration related to validation.
 
     L{pyxb.GlobalValidationConfig} is available to influence validation in all
@@ -200,7 +212,8 @@ class ValidationConfig (object):
     """
 
     __forBinding = True
-    def _getForBinding (self):
+
+    def _getForBinding(self):
         """C{True} iff validation should be performed when manipulating a
         binding instance.
 
@@ -208,17 +221,20 @@ class ValidationConfig (object):
         class constructor, or assigning to an element or attribute field of a
         binding instance."""
         return self.__forBinding
-    def _setForBinding (self, value):
+
+    def _setForBinding(self, value):
         """Configure whether validation should be performed when manipulating
         a binding instance."""
         if not isinstance(value, bool):
             raise TypeError(value)
         self.__forBinding = value
         return value
+
     forBinding = property(_getForBinding)
 
     __forDocument = True
-    def _getForDocument (self):
+
+    def _getForDocument(self):
         """C{True} iff validation should be performed when creating a document
         from a binding instance.
 
@@ -226,13 +242,15 @@ class ValidationConfig (object):
         L{toDOM()<pyxb.binding.basis._TypeBinding_mixin.toDOM>}.
         L{toxml()<pyxb.binding.basis._TypeBinding_mixin.toDOM>} invokes C{toDOM()}."""
         return self.__forDocument
-    def _setForDocument (self, value):
+
+    def _setForDocument(self, value):
         """Configure whether validation should be performed when generating
         a document from a binding instance."""
         if not isinstance(value, bool):
             raise TypeError(value)
         self.__forDocument = value
         return value
+
     forDocument = property(_getForDocument)
 
     ALWAYS = -1
@@ -258,21 +276,25 @@ class ValidationConfig (object):
     """Only when content type is mixed."""
 
     __contentInfluencesGeneration = MIXED_ONLY
-    def __getContentInfluencesGeneration (self):
+
+    def __getContentInfluencesGeneration(self):
         """Determine whether complex type content influences element order in
         document generation.
 
         The value is one of L{ALWAYS}, L{NEVER}, L{MIXED_ONLY} (default)."""
         return self.__contentInfluencesGeneration
-    def _setContentInfluencesGeneration (self, value):
+
+    def _setContentInfluencesGeneration(self, value):
         """Set the value of L{contentInfluencesGeneration}."""
-        if not (value in ( self.ALWAYS, self.NEVER, self.MIXED_ONLY )):
+        if not (value in (self.ALWAYS, self.NEVER, self.MIXED_ONLY)):
             raise ValueError(value)
         self.__contentInfluencesGeneration = value
+
     contentInfluencesGeneration = property(__getContentInfluencesGeneration)
 
     __orphanElementInContent = IGNORE_ONCE
-    def __getOrphanElementInContent (self):
+
+    def __getOrphanElementInContent(self):
         """How to handle unrecognized elements in content lists.
 
         This is used when consulting a complex type instance content list to
@@ -281,41 +303,49 @@ class ValidationConfig (object):
         The value is one of L{IGNORE_ONCE} (default), L{GIVE_UP},
         L{RAISE_EXCEPTION}."""
         return self.__orphanElementInContent
-    def _setOrphanElementInContent (self, value):
+
+    def _setOrphanElementInContent(self, value):
         """Set the value of L{orphanElementInContent}."""
-        if not (value in ( self.IGNORE_ONCE, self.GIVE_UP, self.RAISE_EXCEPTION )):
+        if not (value in (self.IGNORE_ONCE, self.GIVE_UP, self.RAISE_EXCEPTION)):
             raise ValueError(value)
         self.__orphanElementInContent = value
+
     orphanElementInContent = property(__getOrphanElementInContent)
 
     __invalidElementInContent = IGNORE_ONCE
-    def __getInvalidElementInContent (self):
+
+    def __getInvalidElementInContent(self):
         """How to handle invalid elements in content lists.
 
         The value is one of L{IGNORE_ONCE} (default), L{GIVE_UP},
         L{RAISE_EXCEPTION}."""
         return self.__invalidElementInContent
-    def _setInvalidElementInContent (self, value):
+
+    def _setInvalidElementInContent(self, value):
         """Set the value of L{invalidElementInContent}."""
-        if not (value in ( self.IGNORE_ONCE, self.GIVE_UP, self.RAISE_EXCEPTION )):
+        if not (value in (self.IGNORE_ONCE, self.GIVE_UP, self.RAISE_EXCEPTION)):
             raise ValueError(value)
         self.__invalidElementInContent = value
+
     invalidElementInContent = property(__getInvalidElementInContent)
 
-    def copy (self):
+    def copy(self):
         """Make a copy of this instance.
 
         Use this to get a starting point when you need to customize validation
         on a per-instance/per-class basis."""
         import copy
+
         return copy.copy(self)
+
 
 GlobalValidationConfig = ValidationConfig()
 
 _GenerationRequiresValid = True
 """Legacy flag; prefer L{forDocument<ValidationConfig.forDocument>} in L{GlobalValidationConfig}."""
 
-def RequireValidWhenGenerating (value=None):
+
+def RequireValidWhenGenerating(value=None):
     """Query or set a flag that controls validation checking in XML generation.
 
     Normally any attempts to convert a binding instance to a DOM or XML
@@ -332,16 +362,19 @@ def RequireValidWhenGenerating (value=None):
     @type value: C{bool}
 
     @return: C{True} iff attempts to generate XML for a binding that does not
-    validate should raise an exception.  """
+    validate should raise an exception."""
     if value is None:
         return GlobalValidationConfig.forDocument
     global _GenerationRequiresValid
     _GenerationRequiresValid = GlobalValidationConfig._setForDocument(value)
     return value
 
+
 _ParsingRequiresValid = True
 """Legacy flag; prefer L{forBinding<ValidationConfig.forBinding>} in L{GlobalValidationConfig}."""
-def RequireValidWhenParsing (value=None):
+
+
+def RequireValidWhenParsing(value=None):
     """Query or set a flag that controls validation checking in XML parsing.
 
     Normally any attempts to convert XML to a binding instance to a binding
@@ -364,8 +397,11 @@ def RequireValidWhenParsing (value=None):
     _ParsingRequiresValid = GlobalValidationConfig._setForBinding(value)
     return _ParsingRequiresValid
 
+
 _PreserveInputTimeZone = False
-def PreserveInputTimeZone (value=None):
+
+
+def PreserveInputTimeZone(value=None):
     """Control whether time values are converted to UTC during input.
 
     The U{specification <http://www.w3.org/TR/xmlschema-2/#dateTime>} makes
@@ -383,17 +419,19 @@ def PreserveInputTimeZone (value=None):
     _PreserveInputTimeZone = value
     return _PreserveInputTimeZone
 
-_OutputEncoding = 'utf-8'
+
+_OutputEncoding = "utf-8"
 """Default unicode encoding to use when creating output.
 
 Material being written to an XML parser is not output."""
 
-_InputEncoding = 'utf-8'
+_InputEncoding = "utf-8"
 """Default unicode encoding to assume when decoding input.
 
 Material being written to an XML parser is treated as input."""
 
-def NonElementContent (instance):
+
+def NonElementContent(instance):
     """Return an iterator producing the non-element content of the provided instance.
 
     The catenated text of the non-element content of an instance can
@@ -406,7 +444,11 @@ def NonElementContent (instance):
     @return: an iterator producing text values
     """
     import pyxb.binding.basis
-    return pyxb.binding.basis.NonElementContent.ContentIterator(instance.orderedContent())
+
+    return pyxb.binding.basis.NonElementContent.ContentIterator(
+        instance.orderedContent()
+    )
+
 
 ## Local Variables:
 ## fill-column:78

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import pyxb
@@ -10,17 +11,21 @@ import pyxb.utils.domutils
 from xml.dom import Node
 
 import os.path
-schema_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../schemas/test-typeinf.xsd'))
+
+schema_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../schemas/test-typeinf.xsd")
+)
 code = pyxb.binding.generate.GeneratePython(schema_location=schema_path)
 
-rv = compile(code, 'test', 'exec')
+rv = compile(code, "test", "exec")
 eval(rv)
 
 import unittest
 
-class TestTypeInference (unittest.TestCase):
-    def testBasic (self):
-        e = anyType(4) # should be int
+
+class TestTypeInference(unittest.TestCase):
+    def testBasic(self):
+        e = anyType(4)  # should be int
         self.assertEqual(e.int, 4)
         self.assertTrue(e.float is None)
         self.assertTrue(e.str is None)
@@ -33,5 +38,6 @@ class TestTypeInference (unittest.TestCase):
         self.assertTrue(e.float is None)
         self.assertEqual(e.str, "3")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

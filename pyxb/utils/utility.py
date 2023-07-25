@@ -27,15 +27,18 @@ from pyxb.utils import six
 
 _log = logging.getLogger(__name__)
 
-class Object (object):
+
+class Object(object):
     """A dummy class used to hold arbitrary attributes.
 
     Essentially this gives us a map without having to worry about
     converting names to text to use as keys.
     """
+
     pass
 
-def BackfillComparisons (cls):
+
+def BackfillComparisons(cls):
     """Class decorator that fills in missing ordering methods.
 
     Concept derived from Python 2.7.5 functools.total_ordering,
@@ -46,25 +49,30 @@ def BackfillComparisons (cls):
     This is still necessary in Python 3 because in Python 3 the
     comparison x >= y is done by the __ge__ inherited from object,
     which does not handle the case where x and y are not the same type
-    even if the underlying y < x would convert x to be compatible. """
+    even if the underlying y < x would convert x to be compatible."""
 
-    def applyconvert (cls, derived):
-        for (opn, opx) in derived:
+    def applyconvert(cls, derived):
+        for opn, opx in derived:
             opx.__name__ = opn
             opx.__doc__ = getattr(int, opn).__doc__
             setattr(cls, opn, opx)
 
-    applyconvert(cls, (
-            ('__gt__', lambda self, other: not (self.__lt__(other) or self.__eq__(other))),
-            ('__le__', lambda self, other: self.__lt__(other) or self.__eq__(other)),
-            ('__ge__', lambda self, other: not self.__lt__(other))
-            ))
-    applyconvert(cls, (
-            ('__ne__', lambda self, other: not self.__eq__(other)),
-            ))
+    applyconvert(
+        cls,
+        (
+            (
+                "__gt__",
+                lambda self, other: not (self.__lt__(other) or self.__eq__(other)),
+            ),
+            ("__le__", lambda self, other: self.__lt__(other) or self.__eq__(other)),
+            ("__ge__", lambda self, other: not self.__lt__(other)),
+        ),
+    )
+    applyconvert(cls, (("__ne__", lambda self, other: not self.__eq__(other)),))
     return cls
 
-def IteratedCompareMixed (lhs, rhs):
+
+def IteratedCompareMixed(lhs, rhs):
     """Tuple comparison that permits C{None} as lower than any value,
     and defines other cross-type comparison.
 
@@ -94,7 +102,8 @@ def IteratedCompareMixed (lhs, rhs):
                 return 0
             return 1
 
-def QuotedEscaped (s):
+
+def QuotedEscaped(s):
     """Convert a string into a literal value that can be used in Python source.
 
     This just calls C{repr}.  No point in getting all complex when the language
@@ -104,7 +113,8 @@ def QuotedEscaped (s):
     """
     return repr(s)
 
-def _DefaultXMLIdentifierToPython (identifier):
+
+def _DefaultXMLIdentifierToPython(identifier):
     """Default implementation for _XMLIdentifierToPython
 
     For historical reasons, this converts the identifier from a str to
@@ -118,7 +128,8 @@ def _DefaultXMLIdentifierToPython (identifier):
 
     return six.text_type(identifier)
 
-def _SetXMLIdentifierToPython (xml_identifier_to_python):
+
+def _SetXMLIdentifierToPython(xml_identifier_to_python):
     """Configure a callable L{MakeIdentifier} uses to pre-process an XM Lidentifier.
 
     In Python3, identifiers can be full Unicode tokens, but in Python2,
@@ -154,15 +165,17 @@ def _SetXMLIdentifierToPython (xml_identifier_to_python):
         xml_identifier_to_python = _DefaultXMLIdentifierToPython
     _XMLIdentifierToPython = xml_identifier_to_python
 
+
 _XMLIdentifierToPython = _DefaultXMLIdentifierToPython
 
-_UnderscoreSubstitute_re = re.compile(r'[- .]')
-_NonIdentifier_re = re.compile(r'[^a-zA-Z0-9_]')
-_PrefixUnderscore_re = re.compile(r'^_+')
-_PrefixDigit_re = re.compile(r'^\d+')
-_CamelCase_re = re.compile(r'_\w')
+_UnderscoreSubstitute_re = re.compile(r"[- .]")
+_NonIdentifier_re = re.compile(r"[^a-zA-Z0-9_]")
+_PrefixUnderscore_re = re.compile(r"^_+")
+_PrefixDigit_re = re.compile(r"^\d+")
+_CamelCase_re = re.compile(r"_\w")
 
-def MakeIdentifier (s, camel_case=False):
+
+def MakeIdentifier(s, camel_case=False):
     """Convert a string into something suitable to be a Python identifier.
 
     The string is processed by L{_XMLIdentifierToPython}.  Following
@@ -184,42 +197,82 @@ def MakeIdentifier (s, camel_case=False):
     @rtype: C{str}
     """
     s = _XMLIdentifierToPython(s)
-    s = _PrefixUnderscore_re.sub('', _NonIdentifier_re.sub('', _UnderscoreSubstitute_re.sub('_', s)))
+    s = _PrefixUnderscore_re.sub(
+        "", _NonIdentifier_re.sub("", _UnderscoreSubstitute_re.sub("_", s))
+    )
     if camel_case:
         s = _CamelCase_re.sub(lambda _m: _m.group(0)[1].upper(), s)
     if _PrefixDigit_re.match(s):
-        s = 'n' + s
+        s = "n" + s
     if 0 == len(s):
-        s = 'emptyString'
+        s = "emptyString"
     return s
 
-def MakeModuleElement (s):
+
+def MakeModuleElement(s):
     """Convert a string into something that can be a valid element in a
     Python module path.
 
     Module path elements are similar to identifiers, but may begin
     with numbers and should not have leading underscores removed.
     """
-    return _UnderscoreSubstitute_re.sub('_', _XMLIdentifierToPython(s))
+    return _UnderscoreSubstitute_re.sub("_", _XMLIdentifierToPython(s))
 
-_PythonKeywords = frozenset( (
-        "and", "as", "assert", "break", "class", "continue", "def", "del",
-        "elif", "else", "except", "exec", "finally", "for", "from", "global",
-        "if", "import", "in", "is", "lambda", "not", "or", "pass", "print",
-        "raise", "return", "try", "while", "with", "yield"
-        ) )
+
+_PythonKeywords = frozenset(
+    (
+        "and",
+        "as",
+        "assert",
+        "break",
+        "class",
+        "continue",
+        "def",
+        "del",
+        "elif",
+        "else",
+        "except",
+        "exec",
+        "finally",
+        "for",
+        "from",
+        "global",
+        "if",
+        "import",
+        "in",
+        "is",
+        "lambda",
+        "not",
+        "or",
+        "pass",
+        "print",
+        "raise",
+        "return",
+        "try",
+        "while",
+        "with",
+        "yield",
+    )
+)
 """Python keywords.  Note that types like int and float are not
 keywords.
 
 @see: U{http://docs.python.org/reference/lexical_analysis.html#keywords}."""
 
-_PythonBuiltInConstants = frozenset( (
-        "False", "True", "None", "NotImplemented", "Ellipsis", "__debug__",
+_PythonBuiltInConstants = frozenset(
+    (
+        "False",
+        "True",
+        "None",
+        "NotImplemented",
+        "Ellipsis",
+        "__debug__",
         # "set" is neither a keyword nor a constant, but if some fool
         # like {http://www.w3.org/2001/SMIL20/}set gets defined there's
         # no way to access the builtin constructor.
-        "set"
-        ) )
+        "set",
+    )
+)
 """Other symbols that aren't keywords but that can't be used.
 
 @see: U{http://docs.python.org/library/constants.html}."""
@@ -228,7 +281,8 @@ _Keywords = frozenset(_PythonKeywords.union(_PythonBuiltInConstants))
 """The keywords reserved for Python, derived from L{_PythonKeywords}
 and L{_PythonBuiltInConstants}."""
 
-def DeconflictKeyword (s, aux_keywords=frozenset()):
+
+def DeconflictKeyword(s, aux_keywords=frozenset()):
     """If the provided string C{s} matches a Python language keyword,
     append an underscore to distinguish them.
 
@@ -243,10 +297,11 @@ def DeconflictKeyword (s, aux_keywords=frozenset()):
 
     """
     if (s in _Keywords) or (s in aux_keywords):
-        return '%s_' % (s,)
+        return "%s_" % (s,)
     return s
 
-def MakeUnique (s, in_use):
+
+def MakeUnique(s, in_use):
     """Return an identifier based on C{s} that is not in the given set.
 
     The returned identifier is made unique by appending an underscore
@@ -262,16 +317,19 @@ def MakeUnique (s, in_use):
     """
     if s in in_use:
         ctr = 2
-        s = s.rstrip('_')
-        candidate = '%s_' % (s,)
+        s = s.rstrip("_")
+        candidate = "%s_" % (s,)
         while candidate in in_use:
-            candidate = '%s_%d' % (s, ctr)
+            candidate = "%s_%d" % (s, ctr)
             ctr += 1
         s = candidate
     in_use.add(s)
     return s
 
-def PrepareIdentifier (s, in_use, aux_keywords=frozenset(), private=False, protected=False):
+
+def PrepareIdentifier(
+    s, in_use, aux_keywords=frozenset(), private=False, protected=False
+):
     """Combine everything required to create a unique identifier.
 
     Leading and trailing underscores are stripped from all
@@ -300,15 +358,16 @@ def PrepareIdentifier (s, in_use, aux_keywords=frozenset(), private=False, prote
     infrastructure does not include protected symbols.  All class and
     instance members beginning with a single underscore are reserved
     for the PyXB infrastructure."""
-    s = DeconflictKeyword(MakeIdentifier(s).strip('_'), aux_keywords)
+    s = DeconflictKeyword(MakeIdentifier(s).strip("_"), aux_keywords)
     if private:
-        s = '__' + s
+        s = "__" + s
     elif protected:
-        s = '_' + s
+        s = "_" + s
     return MakeUnique(s, in_use)
 
+
 # @todo: descend from pyxb.cscRoot, if we import pyxb
-class _DeconflictSymbols_mixin (object):
+class _DeconflictSymbols_mixin(object):
     """Mix-in used to deconflict public symbols in classes that may be
     inherited by generated binding classes.
 
@@ -340,12 +399,14 @@ class _DeconflictSymbols_mixin (object):
     _ReservedSymbols = set()
     """There are no reserved symbols in the base class."""
 
+
 # Regular expression detecting tabs, carriage returns, and line feeds
 __TabCRLF_re = re.compile("[\t\n\r]")
 # Regular expressoin detecting sequences of two or more spaces
 __MultiSpace_re = re.compile(" +")
 
-def NormalizeWhitespace (text, preserve=False, replace=False, collapse=False):
+
+def NormalizeWhitespace(text, preserve=False, replace=False, collapse=False):
     """Normalize the given string.
 
     Exactly one of the C{preserve}, C{replace}, and C{collapse} keyword
@@ -365,13 +426,14 @@ def NormalizeWhitespace (text, preserve=False, replace=False, collapse=False):
     """
     if preserve:
         return text
-    text = __TabCRLF_re.sub(' ', text)
+    text = __TabCRLF_re.sub(" ", text)
     if replace:
         return text
     if collapse:
-        return __MultiSpace_re.sub(' ', text).strip()
+        return __MultiSpace_re.sub(" ", text).strip()
     # pyxb not imported here; could be.
-    raise Exception('NormalizeWhitespace: No normalization specified')
+    raise Exception("NormalizeWhitespace: No normalization specified")
+
 
 class Graph:
     """Represent a directed graph with arbitrary objects as nodes.
@@ -384,37 +446,38 @@ class Graph:
     of C{target} already be available.
     """
 
-    def __init__ (self, root=None):
+    def __init__(self, root=None):
         self.__roots = None
         if root is not None:
             self.__roots = set([root])
         self.__edges = set()
-        self.__edgeMap = { }
-        self.__reverseMap = { }
+        self.__edgeMap = {}
+        self.__reverseMap = {}
         self.__nodes = set()
 
     __scc = None
     __sccMap = None
     __dfsOrder = None
 
-    def addEdge (self, source, target):
+    def addEdge(self, source, target):
         """Add a directed edge from the C{source} to the C{target}.
 
         The nodes are added to the graph if necessary.
         """
-        self.__edges.add( (source, target) )
+        self.__edges.add((source, target))
         self.__edgeMap.setdefault(source, set()).add(target)
         if source != target:
             self.__reverseMap.setdefault(target, set()).add(source)
         self.__nodes.add(source)
         self.__nodes.add(target)
 
-    def addNode (self, node):
+    def addNode(self, node):
         """Add  the given node to the graph."""
         self.__nodes.add(node)
 
     __roots = None
-    def roots (self, reset=False):
+
+    def roots(self, reset=False):
         """Return the set of nodes calculated to be roots (i.e., those that have no incoming edges).
 
         This caches the roots calculated in a previous invocation
@@ -434,7 +497,8 @@ class Graph:
                 if not (n in self.__reverseMap):
                     self.__roots.add(n)
         return self.__roots
-    def addRoot (self, root):
+
+    def addRoot(self, root):
         """Add the provided node as a root node, even if it has incoming edges.
 
         The node need not be present in the graph (if necessary, it is added).
@@ -450,7 +514,7 @@ class Graph:
         self.__roots.add(root)
         return self
 
-    def edgeMap (self):
+    def edgeMap(self):
         """Return the edges in the graph.
 
         The edge data structure is a map from the source node to the
@@ -458,23 +522,24 @@ class Graph:
         source.
         """
         return self.__edgeMap
+
     __edgeMap = None
 
-    def edges (self):
+    def edges(self):
         """Return the edges in the graph.
 
         The edge data structure is a set of node pairs represented as C{( source, target )}.
         """
         return self.__edges
 
-    def nodes (self):
+    def nodes(self):
         """Return the set of nodes in the graph.
 
         The node collection data structure is a set containing node
         objects, whatever they may be."""
         return self.__nodes
 
-    def tarjan (self, reset=False):
+    def tarjan(self, reset=False):
         """Execute Tarjan's algorithm on the graph.
 
         U{Tarjan's
@@ -492,23 +557,25 @@ class Graph:
 
         if (self.__scc is not None) and (not reset):
             return
-        self.__sccMap = { }
+        self.__sccMap = {}
         self.__stack = []
         self.__sccOrder = []
         self.__scc = []
         self.__index = 0
-        self.__tarjanIndex = { }
-        self.__tarjanLowLink = { }
+        self.__tarjanIndex = {}
+        self.__tarjanLowLink = {}
         for v in self.__nodes:
             self.__tarjanIndex[v] = None
         roots = self.roots()
         if (0 == len(roots)) and (0 < len(self.__nodes)):
-            raise Exception('TARJAN: No roots found in graph with %d nodes' % (len(self.__nodes),))
+            raise Exception(
+                "TARJAN: No roots found in graph with %d nodes" % (len(self.__nodes),)
+            )
         for r in roots:
             self._tarjan(r)
         self.__didTarjan = True
 
-    def _tarjan (self, v):
+    def _tarjan(self, v):
         """Do the work of Tarjan's algorithm for a given root node."""
         if self.__tarjanIndex.get(v) is not None:
             # "Root" was already reached.
@@ -520,9 +587,13 @@ class Graph:
         for target in self.__edgeMap.get(source, []):
             if self.__tarjanIndex[target] is None:
                 self._tarjan(target)
-                self.__tarjanLowLink[v] = min(self.__tarjanLowLink[v], self.__tarjanLowLink[target])
+                self.__tarjanLowLink[v] = min(
+                    self.__tarjanLowLink[v], self.__tarjanLowLink[target]
+                )
             elif target in self.__stack:
-                self.__tarjanLowLink[v] = min(self.__tarjanLowLink[v], self.__tarjanLowLink[target])
+                self.__tarjanLowLink[v] = min(
+                    self.__tarjanLowLink[v], self.__tarjanLowLink[target]
+                )
             else:
                 pass
 
@@ -535,9 +606,9 @@ class Graph:
             self.__sccOrder.append(scc)
             if 1 < len(scc):
                 self.__scc.append(scc)
-                [ self.__sccMap.setdefault(_v, scc) for _v in scc ]
+                [self.__sccMap.setdefault(_v, scc) for _v in scc]
 
-    def scc (self, reset=False):
+    def scc(self, reset=False):
         """Return the strongly-connected components of the graph.
 
         The data structure is a set, each element of which is itself a
@@ -548,9 +619,10 @@ class Graph:
         if reset or (self.__scc is None):
             self.tarjan(reset)
         return self.__scc
+
     __scc = None
 
-    def sccMap (self, reset=False):
+    def sccMap(self, reset=False):
         """Return a map from nodes to the strongly-connected component
         to which the node belongs.
 
@@ -563,9 +635,10 @@ class Graph:
         if reset or (self.__sccMap is None):
             self.tarjan(reset)
         return self.__sccMap
+
     __sccMap = None
 
-    def sccOrder (self, reset=False):
+    def sccOrder(self, reset=False):
         """Return the strongly-connected components in order.
 
         The data structure is a list, in dependency order, of strongly
@@ -580,9 +653,10 @@ class Graph:
         if reset or (self.__sccOrder is None):
             self.tarjan(reset)
         return self.__sccOrder
+
     __sccOrder = None
 
-    def sccForNode (self, node, **kw):
+    def sccForNode(self, node, **kw):
         """Return the strongly-connected component to which the given
         node belongs.
 
@@ -594,12 +668,12 @@ class Graph:
 
         return self.sccMap(**kw).get(node)
 
-    def cyclomaticComplexity (self):
+    def cyclomaticComplexity(self):
         """Return the cyclomatic complexity of the graph."""
         self.tarjan()
         return len(self.__edges) - len(self.__nodes) + 2 * len(self.__scc)
 
-    def __dfsWalk (self, source):
+    def __dfsWalk(self, source):
         assert not (source in self.__dfsWalked)
         self.__dfsWalked.add(source)
         for target in self.__edgeMap.get(source, []):
@@ -607,8 +681,8 @@ class Graph:
                 self.__dfsWalk(target)
         self.__dfsOrder.append(source)
 
-    def _generateDOT (self, title='UNKNOWN', labeller=None):
-        node_map = { }
+    def _generateDOT(self, title="UNKNOWN", labeller=None):
+        node_map = {}
         idx = 1
         for n in self.__nodes:
             node_map[n] = idx
@@ -624,11 +698,11 @@ class Graph:
         for s in self.__nodes:
             for d in self.__edgeMap.get(s, []):
                 if s != d:
-                    text.append('%s -> %s;' % (node_map[s], node_map[d]))
+                    text.append("%s -> %s;" % (node_map[s], node_map[d]))
         text.append("};")
         return "\n".join(text)
 
-    def dfsOrder (self, reset=False):
+    def dfsOrder(self, reset=False):
         """Return the nodes of the graph in U{depth-first-search
         order<http://en.wikipedia.org/wiki/Depth-first_search>}.
 
@@ -644,10 +718,13 @@ class Graph:
                 self.__dfsWalk(root)
             self.__dfsWalked = None
             if len(self.__dfsOrder) != len(self.__nodes):
-                raise Exception('DFS walk did not cover all nodes (walk %d versus nodes %d)' % (len(self.__dfsOrder), len(self.__nodes)))
+                raise Exception(
+                    "DFS walk did not cover all nodes (walk %d versus nodes %d)"
+                    % (len(self.__dfsOrder), len(self.__nodes))
+                )
         return self.__dfsOrder
 
-    def rootSetOrder (self):
+    def rootSetOrder(self):
         """Return the nodes of the graph as a sequence of root sets.
 
         The first root set is the set of nodes that are roots: i.e.,
@@ -661,7 +738,7 @@ class Graph:
         order = []
         nodes = set(self.__nodes)
         edge_map = {}
-        for (d, srcs) in six.iteritems(self.__edgeMap):
+        for d, srcs in six.iteritems(self.__edgeMap):
             edge_map[d] = srcs.copy()
         while nodes:
             freeset = set()
@@ -669,27 +746,30 @@ class Graph:
                 if not (n in edge_map):
                     freeset.add(n)
             if 0 == len(freeset):
-                _log.error('dependency cycle in named components')
+                _log.error("dependency cycle in named components")
                 return None
             order.append(freeset)
             nodes.difference_update(freeset)
             new_edge_map = {}
-            for (d, srcs) in six.iteritems(edge_map):
+            for d, srcs in six.iteritems(edge_map):
                 srcs.difference_update(freeset)
                 if 0 != len(srcs):
                     new_edge_map[d] = srcs
             edge_map = new_edge_map
         return order
 
-LocationPrefixRewriteMap_ = { }
 
-def SetLocationPrefixRewriteMap (prefix_map):
+LocationPrefixRewriteMap_ = {}
+
+
+def SetLocationPrefixRewriteMap(prefix_map):
     """Set the map that is used to by L{NormalizeLocation} to rewrite URI prefixes."""
 
     LocationPrefixRewriteMap_.clear()
     LocationPrefixRewriteMap_.update(prefix_map)
 
-def NormalizeLocation (uri, parent_uri=None, prefix_map=None):
+
+def NormalizeLocation(uri, parent_uri=None, prefix_map=None):
     """Normalize a URI against an optional parent_uri in the way that is
     done for C{schemaLocation} attribute values.
 
@@ -721,33 +801,35 @@ def NormalizeLocation (uri, parent_uri=None, prefix_map=None):
         abs_uri = urlparse.urljoin(parent_uri, uri)
     if prefix_map is None:
         prefix_map = LocationPrefixRewriteMap_
-    for (pfx, sub) in six.iteritems(prefix_map):
+    for pfx, sub in six.iteritems(prefix_map):
         if abs_uri.startswith(pfx):
-            abs_uri = sub + abs_uri[len(pfx):]
-    if 0 > abs_uri.find(':'):
+            abs_uri = sub + abs_uri[len(pfx) :]
+    if 0 > abs_uri.find(":"):
         abs_uri = os.path.realpath(abs_uri)
     return abs_uri
 
 
-def DataFromURI (uri, archive_directory=None):
+def DataFromURI(uri, archive_directory=None):
     """Retrieve the contents of the uri as raw data.
 
     If the uri does not include a scheme (e.g., C{http:}), it is
     assumed to be a file path on the local system."""
 
     from pyxb.utils.six.moves.urllib.request import urlopen
+
     stream = None
     exc = None
     # Only something that has a colon is a non-file URI.  Some things
     # that have a colon are a file URI (sans schema).  Prefer urllib2,
     # but allow urllib (which apparently works better on Windows).
-    if 0 <= uri.find(':'):
+    if 0 <= uri.find(":"):
         try:
             stream = urlopen(uri)
         except Exception as e:
             exc = e
         if (stream is None) and six.PY2:
             import urllib
+
             try:
                 stream = urllib.urlopen(uri)
                 exc = None
@@ -757,13 +839,13 @@ def DataFromURI (uri, archive_directory=None):
     if stream is None:
         # No go as URI; give file a chance
         try:
-            stream = open(uri, 'rb')
+            stream = open(uri, "rb")
             exc = None
         except Exception as e:
             if exc is None:
                 exc = e
     if exc is not None:
-        _log.error('open %s', uri, exc_info=exc)
+        _log.error("open %s", uri, exc_info=exc)
         raise exc
     try:
         # Protect this in case whatever stream is doesn't have an fp
@@ -778,15 +860,16 @@ def DataFromURI (uri, archive_directory=None):
         counter = 1
         dest_file = os.path.join(archive_directory, base_name)
         while os.path.isfile(dest_file):
-            dest_file = os.path.join(archive_directory, '%s.%d' % (base_name, counter))
+            dest_file = os.path.join(archive_directory, "%s.%d" % (base_name, counter))
             counter += 1
         try:
             OpenOrCreate(dest_file).write(xmld)
         except OSError as e:
-            _log.warning('Unable to save %s in %s: %s', uri, dest_file, e)
+            _log.warning("Unable to save %s in %s: %s", uri, dest_file, e)
     return xmld
 
-def OpenOrCreate (file_name, tag=None, preserve_contents=False):
+
+def OpenOrCreate(file_name, tag=None, preserve_contents=False):
     """Return a file object used to write binary data into the given file.
 
     Use the C{tag} keyword to preserve the contents of existing files
@@ -815,30 +898,34 @@ def OpenOrCreate (file_name, tag=None, preserve_contents=False):
         except Exception as e:
             if not (isinstance(e, (OSError, IOError)) and (errno.EEXIST == e.errno)):
                 raise
-    fp = open(file_name, 'ab+')
+    fp = open(file_name, "ab+")
     if (tag is not None) and (0 < os.fstat(fp.fileno()).st_size):
-        fp.seek(0) # os.SEEK_SET
+        fp.seek(0)  # os.SEEK_SET
         blockd = fp.read(4096)
-        blockt = blockd.decode('utf-8')
+        blockt = blockd.decode("utf-8")
         if 0 > blockt.find(tag):
             raise OSError(errno.EEXIST, os.strerror(errno.EEXIST))
     if not preserve_contents:
-        fp.seek(0) # os.SEEK_SET
+        fp.seek(0)  # os.SEEK_SET
         fp.truncate()
     else:
-        fp.seek(2) # os.SEEK_END
+        fp.seek(2)  # os.SEEK_END
     return fp
+
 
 # hashlib didn't show up until 2.5, and sha is deprecated in 2.6.
 __Hasher = None
 try:
     import hashlib
+
     __Hasher = hashlib.sha1
 except ImportError:
     import sha
+
     __Hasher = sha.new
 
-def HashForText (text):
+
+def HashForText(text):
     """Calculate a cryptographic hash of the given string.
 
     For example, this is used to verify that a given module file
@@ -849,17 +936,21 @@ def HashForText (text):
     @return: A C{str}, generally a sequence of hexadecimal "digit"s.
     """
     if isinstance(text, six.text_type):
-        text = text.encode('utf-8')
+        text = text.encode("utf-8")
     return __Hasher(text).hexdigest()
+
 
 # uuid didn't show up until 2.5
 __HaveUUID = False
 try:
     import uuid
+
     __HaveUUID = True
 except ImportError:
     import random
-def _NewUUIDString ():
+
+
+def _NewUUIDString():
     """Obtain a UUID using the best available method.  On a version of
     python that does not incorporate the C{uuid} class, this creates a
     string combining the current date and time (to the second) with a
@@ -869,9 +960,10 @@ def _NewUUIDString ():
     """
     if __HaveUUID:
         return uuid.uuid1().urn
-    return '%s:%08.8x' % (time.strftime('%Y%m%d%H%M%S'), random.randint(0, 0xFFFFFFFF))
+    return "%s:%08.8x" % (time.strftime("%Y%m%d%H%M%S"), random.randint(0, 0xFFFFFFFF))
 
-class UniqueIdentifier (object):
+
+class UniqueIdentifier(object):
     """Records a unique identifier, generally associated with a
     binding generation action.
 
@@ -890,23 +982,24 @@ class UniqueIdentifier (object):
     # A map from UID string to the instance that represents it
     __ExistingUIDs = {}
 
-    def uid (self):
+    def uid(self):
         """The string unique identifier"""
         return self.__uid
+
     __uid = None
 
     # Support pickling, which is done using only the UID.
-    def __getnewargs__ (self):
+    def __getnewargs__(self):
         return (self.__uid,)
 
-    def __getstate__ (self):
+    def __getstate__(self):
         return self.__uid
 
-    def __setstate__ (self, state):
+    def __setstate__(self, state):
         assert self.__uid == state
 
     # Singleton-like
-    def __new__ (cls, *args):
+    def __new__(cls, *args):
         if 0 == len(args):
             uid = _NewUUIDString()
         else:
@@ -914,7 +1007,7 @@ class UniqueIdentifier (object):
         if isinstance(uid, UniqueIdentifier):
             uid = uid.uid()
         if not isinstance(uid, six.string_types):
-            raise TypeError('UniqueIdentifier uid must be a string')
+            raise TypeError("UniqueIdentifier uid must be a string")
         rv = cls.__ExistingUIDs.get(uid)
         if rv is None:
             rv = super(UniqueIdentifier, cls).__new__(cls)
@@ -922,19 +1015,21 @@ class UniqueIdentifier (object):
             cls.__ExistingUIDs[uid] = rv
         return rv
 
-    def associateObject (self, obj):
+    def associateObject(self, obj):
         """Associate the given object witth this identifier.
 
         This is a one-way association: the object is not provided with
         a return path to this identifier instance."""
         self.__associatedObjects.add(obj)
-    def associatedObjects (self):
+
+    def associatedObjects(self):
         """The set of objects that have been associated with this
         identifier instance."""
         return self.__associatedObjects
+
     __associatedObjects = None
 
-    def __init__ (self, uid=None):
+    def __init__(self, uid=None):
         """Create a new UniqueIdentifier instance.
 
         @param uid: The unique identifier string.  If present, it is
@@ -942,10 +1037,12 @@ class UniqueIdentifier (object):
         unique.  If C{None}, one will be provided.
         @type uid: C{str} or C{unicode}
         """
-        assert (uid is None) or (self.uid() == uid), 'UniqueIdentifier: ctor %s, actual %s' % (uid, self.uid())
+        assert (uid is None) or (
+            self.uid() == uid
+        ), "UniqueIdentifier: ctor %s, actual %s" % (uid, self.uid())
         self.__associatedObjects = set()
 
-    def __eq__ (self, other):
+    def __eq__(self, other):
         if other is None:
             return False
         elif isinstance(other, UniqueIdentifier):
@@ -953,20 +1050,23 @@ class UniqueIdentifier (object):
         elif isinstance(other, six.string_types):
             other_uid = other
         else:
-            raise TypeError('UniqueIdentifier: Cannot compare with type %s' % (type(other),))
+            raise TypeError(
+                "UniqueIdentifier: Cannot compare with type %s" % (type(other),)
+            )
         return self.uid() == other_uid
 
-    def __hash__ (self):
+    def __hash__(self):
         return hash(self.uid())
 
-    def __str__ (self):
+    def __str__(self):
         return self.uid()
 
-    def __repr__ (self):
-        return 'pyxb.utils.utility.UniqueIdentifier(%s)' % (repr(self.uid()),)
+    def __repr__(self):
+        return "pyxb.utils.utility.UniqueIdentifier(%s)" % (repr(self.uid()),)
+
 
 @BackfillComparisons
-class UTCOffsetTimeZone (datetime.tzinfo):
+class UTCOffsetTimeZone(datetime.tzinfo):
     """A C{datetime.tzinfo} subclass that helps deal with UTC
     conversions in an ISO8601 world.
 
@@ -974,7 +1074,7 @@ class UTCOffsetTimeZone (datetime.tzinfo):
     """
 
     # Regular expression that matches valid ISO8601 time zone suffixes
-    __Lexical_re = re.compile('^([-+])(\d\d):(\d\d)$')
+    __Lexical_re = re.compile("^([-+])(\d\d):(\d\d)$")
 
     # The offset in minutes east of UTC.
     __utcOffset_min = 0
@@ -988,7 +1088,7 @@ class UTCOffsetTimeZone (datetime.tzinfo):
     # Range limits
     __MaxOffset_td = datetime.timedelta(hours=14)
 
-    def __init__ (self, spec=None):
+    def __init__(self, spec=None):
         """Create a time zone instance with a fixed offset from UTC.
 
         @param spec: Specifies the offset.  Can be an integer counting
@@ -999,58 +1099,67 @@ class UTCOffsetTimeZone (datetime.tzinfo):
 
         if spec is not None:
             if isinstance(spec, six.string_types):
-                if 'Z' == spec:
+                if "Z" == spec:
                     self.__utcOffset_min = 0
                 else:
                     match = self.__Lexical_re.match(spec)
                     if match is None:
-                        raise ValueError('Bad time zone: %s' % (spec,))
-                    self.__utcOffset_min = int(match.group(2)) * 60 + int(match.group(3))
-                    if '-' == match.group(1):
-                        self.__utcOffset_min = - self.__utcOffset_min
+                        raise ValueError("Bad time zone: %s" % (spec,))
+                    self.__utcOffset_min = int(match.group(2)) * 60 + int(
+                        match.group(3)
+                    )
+                    if "-" == match.group(1):
+                        self.__utcOffset_min = -self.__utcOffset_min
             elif isinstance(spec, int):
                 self.__utcOffset_min = spec
             elif isinstance(spec, datetime.timedelta):
                 self.__utcOffset_min = spec.seconds // 60
             else:
-                raise TypeError('%s: unexpected type %s' % (type(self), type(spec)))
+                raise TypeError("%s: unexpected type %s" % (type(self), type(spec)))
         self.__utcOffset_td = datetime.timedelta(minutes=self.__utcOffset_min)
-        if self.__utcOffset_td < -self.__MaxOffset_td or self.__utcOffset_td > self.__MaxOffset_td:
-            raise ValueError('XSD timezone offset %s larger than %s' % (self.__utcOffset_td, self.__MaxOffset_td))
+        if (
+            self.__utcOffset_td < -self.__MaxOffset_td
+            or self.__utcOffset_td > self.__MaxOffset_td
+        ):
+            raise ValueError(
+                "XSD timezone offset %s larger than %s"
+                % (self.__utcOffset_td, self.__MaxOffset_td)
+            )
         if 0 == self.__utcOffset_min:
-            self.__tzName = 'Z'
+            self.__tzName = "Z"
         elif 0 > self.__utcOffset_min:
-            self.__tzName = '-%02d:%02d' % divmod(-self.__utcOffset_min, 60)
+            self.__tzName = "-%02d:%02d" % divmod(-self.__utcOffset_min, 60)
         else:
-            self.__tzName = '+%02d:%02d' % divmod(self.__utcOffset_min, 60)
+            self.__tzName = "+%02d:%02d" % divmod(self.__utcOffset_min, 60)
 
-    def utcoffset (self, dt):
+    def utcoffset(self, dt):
         """Returns the constant offset for this zone."""
         return self.__utcOffset_td
 
-    def tzname (self, dt):
+    def tzname(self, dt):
         """Return the name of the timezone in the format expected by XML Schema."""
         return self.__tzName
 
-    def dst (self, dt):
+    def dst(self, dt):
         """Returns a constant zero duration."""
         return self.__ZeroDuration
 
-    def __otherForComparison (self, other):
+    def __otherForComparison(self, other):
         if isinstance(other, UTCOffsetTimeZone):
             return other.__utcOffset_min
         return other.utcoffset(datetime.datetime.now())
 
-    def __hash__ (self):
+    def __hash__(self):
         return hash(self.__utcOffset_min)
 
-    def __eq__ (self, other):
+    def __eq__(self, other):
         return self.__utcOffset_min == self.__otherForComparison(other)
 
-    def __lt__ (self, other):
+    def __lt__(self, other):
         return self.__utcOffset_min < self.__otherForComparison(other)
 
-class LocalTimeZone (datetime.tzinfo):
+
+class LocalTimeZone(datetime.tzinfo):
     """A C{datetime.tzinfo} subclass for the local time zone.
 
     Mostly pinched from the C{datetime.tzinfo} documentation in Python 2.5.1.
@@ -1063,27 +1172,26 @@ class LocalTimeZone (datetime.tzinfo):
     __ZeroDelta = datetime.timedelta(0)
     __DSTDelta = __DSTOffset - __STDOffset
 
-    def utcoffset (self, dt):
+    def utcoffset(self, dt):
         if self.__isDST(dt):
             return self.__DSTOffset
         return self.__STDOffset
 
-    def dst (self, dt):
+    def dst(self, dt):
         if self.__isDST(dt):
             return self.__DSTDelta
         return self.__ZeroDelta
 
-    def tzname (self, dt):
+    def tzname(self, dt):
         return time.tzname[self.__isDST(dt)]
 
-    def __isDST (self, dt):
-        tt = (dt.year, dt.month, dt.day,
-              dt.hour, dt.minute, dt.second,
-              0, 0, -1)
+    def __isDST(self, dt):
+        tt = (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, 0, 0, -1)
         tt = time.localtime(time.mktime(tt))
         return tt.tm_isdst > 0
 
-class PrivateTransient_mixin (pyxb.cscRoot):
+
+class PrivateTransient_mixin(pyxb.cscRoot):
     """Emulate the B{transient} keyword from Java for private member
     variables.
 
@@ -1115,21 +1223,21 @@ class PrivateTransient_mixin (pyxb.cscRoot):
 
     # Suffix used when creating the class member variable in which the
     # transient members are cached.
-    __Attribute = '__PrivateTransient'
+    __Attribute = "__PrivateTransient"
 
-    def __getstate__ (self):
+    def __getstate__(self):
         state = self.__dict__.copy()
         # Note that the aggregate set is stored in a class variable
         # with a slightly different name than the class-level set.
-        attr = '_%s%s_' % (self.__class__.__name__, self.__Attribute)
+        attr = "_%s%s_" % (self.__class__.__name__, self.__Attribute)
         skipped = getattr(self.__class__, attr, None)
         if skipped is None:
             skipped = set()
             for cl in self.__class__.mro():
-                for (k, v) in six.iteritems(cl.__dict__):
+                for k, v in six.iteritems(cl.__dict__):
                     if k.endswith(self.__Attribute):
-                        cl2 = k[:-len(self.__Attribute)]
-                        skipped.update([ '%s__%s' % (cl2, _n) for _n in v ])
+                        cl2 = k[: -len(self.__Attribute)]
+                        skipped.update(["%s__%s" % (cl2, _n) for _n in v])
             setattr(self.__class__, attr, skipped)
         for k in skipped:
             if state.get(k) is not None:
@@ -1137,7 +1245,7 @@ class PrivateTransient_mixin (pyxb.cscRoot):
         # Uncomment the following to test whether undesirable types
         # are being pickled, generally by accidently leaving a
         # reference to one in an instance private member.
-        #for (k, v) in six.iteritems(state):
+        # for (k, v) in six.iteritems(state):
         #    import pyxb.namespace
         #    import xml.dom
         #    import pyxb.xmlschema.structures
@@ -1146,7 +1254,15 @@ class PrivateTransient_mixin (pyxb.cscRoot):
 
         return state
 
-def GetMatchingFiles (path, pattern=None, default_path_wildcard=None, default_path=None, prefix_pattern=None, prefix_substituend=None):
+
+def GetMatchingFiles(
+    path,
+    pattern=None,
+    default_path_wildcard=None,
+    default_path=None,
+    prefix_pattern=None,
+    prefix_substituend=None,
+):
     """Provide a list of absolute paths to files present in any of a
     set of directories and meeting certain criteria.
 
@@ -1203,15 +1319,15 @@ def GetMatchingFiles (path, pattern=None, default_path_wildcard=None, default_pa
             continue
         recursive = False
         if (prefix_pattern is not None) and path.startswith(prefix_pattern):
-            path = os.path.join(prefix_substituend, path[len(prefix_pattern):])
-        if path.endswith('//'):
+            path = os.path.join(prefix_substituend, path[len(prefix_pattern) :])
+        if path.endswith("//"):
             recursive = True
             path = path[:-2]
         if os.path.isfile(path):
             if (pattern is None) or (pattern.search(path) is not None):
                 matching_files.append(path)
         else:
-            for (root, dirs, files) in os.walk(path):
+            for root, dirs, files in os.walk(path):
                 for f in files:
                     if (pattern is None) or (pattern.search(f) is not None):
                         matching_files.append(os.path.join(root, f))
@@ -1219,20 +1335,21 @@ def GetMatchingFiles (path, pattern=None, default_path_wildcard=None, default_pa
                     break
     return matching_files
 
+
 @BackfillComparisons
-class Location (object):
+class Location(object):
     __locationBase = None
     __lineNumber = None
     __columnNumber = None
 
-    def __init__ (self, location_base=None, line_number=None, column_number=None):
+    def __init__(self, location_base=None, line_number=None, column_number=None):
         if isinstance(location_base, str):
             location_base = six.moves.intern(location_base)
         self.__locationBase = location_base
         self.__lineNumber = line_number
         self.__columnNumber = column_number
 
-    def newLocation (self, locator=None, line_number=None, column_number=None):
+    def newLocation(self, locator=None, line_number=None, column_number=None):
         if locator is not None:
             try:
                 line_number = locator.getLineNumber()
@@ -1245,7 +1362,7 @@ class Location (object):
     lineNumber = property(lambda _s: _s.__lineNumber)
     columnNumber = property(lambda _s: _s.__columnNumber)
 
-    def __cmpSingleUnlessNone (self, v1, v2):
+    def __cmpSingleUnlessNone(self, v1, v2):
         if v1 is None:
             if v2 is None:
                 return None
@@ -1258,7 +1375,7 @@ class Location (object):
             return 0
         return 1
 
-    def __cmpTupleUnlessNone (self, v1, v2):
+    def __cmpTupleUnlessNone(self, v1, v2):
         rv = self.__cmpSingleUnlessNone(v1.__locationBase, v2.__locationBase)
         if rv is None:
             rv = self.__cmpSingleUnlessNone(v1.__lineNumber, v2.__lineNumber)
@@ -1266,10 +1383,10 @@ class Location (object):
             rv = self.__cmpSingleUnlessNone(v1.__columnNumber, v2.__columnNumber)
         return rv
 
-    def __hash__ (self):
+    def __hash__(self):
         return hash((self.__locationBase, self.__lineNumber, self.__columnNumber))
 
-    def __eq__ (self, other):
+    def __eq__(self, other):
         """Comparison by locationBase, then lineNumber, then columnNumber."""
         if other is None:
             return False
@@ -1278,7 +1395,7 @@ class Location (object):
             return True
         return 0 == rv
 
-    def __lt__ (self, other):
+    def __lt__(self, other):
         if other is None:
             return False
         rv = self.__cmpTupleUnlessNone(self, other)
@@ -1286,34 +1403,41 @@ class Location (object):
             return False
         return -1 == rv
 
-    def __str__ (self):
+    def __str__(self):
         if self.locationBase is None:
-            lb = '<unknown>'
+            lb = "<unknown>"
         else:
             # No, this should not be os.sep.  The location is
             # expected to be a URI.
-            lb = self.locationBase.rsplit('/', 1)[-1]
-        return '%s[%s:%s]' % (lb, self.lineNumber, self.columnNumber)
+            lb = self.locationBase.rsplit("/", 1)[-1]
+        return "%s[%s:%s]" % (lb, self.lineNumber, self.columnNumber)
 
-    def __repr__ (self):
+    def __repr__(self):
         t = type(self)
-        ctor = '%s.%s' % (t.__module__, t.__name__)
-        return '%s(%s, %r, %r)' % (ctor, repr2to3(self.__locationBase), self.__lineNumber, self.__columnNumber)
+        ctor = "%s.%s" % (t.__module__, t.__name__)
+        return "%s(%s, %r, %r)" % (
+            ctor,
+            repr2to3(self.__locationBase),
+            self.__lineNumber,
+            self.__columnNumber,
+        )
 
-class Locatable_mixin (pyxb.cscRoot):
+
+class Locatable_mixin(pyxb.cscRoot):
     __location = None
 
-    def __init__ (self, *args, **kw):
-        self.__location = kw.pop('location', None)
+    def __init__(self, *args, **kw):
+        self.__location = kw.pop("location", None)
         super(Locatable_mixin, self).__init__(*args, **kw)
 
-    def _setLocation (self, location):
+    def _setLocation(self, location):
         self.__location = location
 
-    def _location (self):
+    def _location(self):
         return self.__location
 
-def repr2to3 (v):
+
+def repr2to3(v):
     """Filtered built-in repr for python 2/3 compatibility in
     generated bindings.
 
@@ -1330,12 +1454,12 @@ def repr2to3 (v):
     """
     if isinstance(v, six.string_types):
         qu = QuotedEscaped(v)
-        if 'u' == qu[0]:
+        if "u" == qu[0]:
             return qu[1:]
         return qu
     if isinstance(v, six.integer_types):
         vs = repr(v)
-        if vs.endswith('L'):
+        if vs.endswith("L"):
             return vs[:-1]
         return vs
     return repr(v)

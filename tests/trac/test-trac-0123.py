@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig()
 _log = logging.getLogger(__name__)
 import sys
@@ -8,7 +9,7 @@ import pyxb.binding.generate
 import pyxb.utils.domutils
 
 
-xmls = '''<?xml version="1.0"?>
+xmls = """<?xml version="1.0"?>
 <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
   <SignedInfo>
     <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
@@ -25,16 +26,17 @@ xmls = '''<?xml version="1.0"?>
     </Reference>
   </SignedInfo>
   <SignatureValue>vG+UCB9C3T8k91yDP2zCvKNHJbp+P1aik9xckByr43y5V5BZktzOF9h4FC8C3mYklg/jTtzWiN4TvAd+wrznpOYDBv3/AseHM+LWG2Q/0t1o8owiliR1z8BqydQUXPuwTSTrPAzEmYFKnq+OQvtq8GiebfYHD2nTKc4M0B8//TuQ295WLwX06RXiuNxGN9C1YvMOL/hHKybPeiVbT7I0wnUMDjf4H/K+4hnCZY2wT+nOBf0fRVkFud/0/lIxCu8T3SMQeSzMRXcdK0FiElFNzh24DJerVwIIZTFXl5Qg42S2Is6kFs1KR0CYDXR/ZVNF5CdVY/xe62t8GUYbTHAoBw==</SignatureValue>
-</Signature>'''
+</Signature>"""
 
 import unittest
 
-class TestTrac0123 (unittest.TestCase):
-    def testEmpty (self):
+
+class TestTrac0123(unittest.TestCase):
+    def testEmpty(self):
         try:
             import pyxb.bundles.wssplat.ds as dsig
         except ImportError as e:
-            _log.warning('%s: skipping test, error importing dsig', __file__)
+            _log.warning("%s: skipping test, error importing dsig", __file__)
             return
         # The warning that InclusiveNamespaces could not be converted
         # is correct.  We don't have bindings for
@@ -47,5 +49,6 @@ class TestTrac0123 (unittest.TestCase):
         # that it can.
         dom = instance.toDOM()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
